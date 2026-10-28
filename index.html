@@ -80,10 +80,7 @@
                 <h2 class="font-display text-3xl font-extrabold text-white">Soccer Career Sim</h2>
                 <p class="text-sm text-slate-400">Sign in to save your progress or play directly in Guest Mode.</p>
             </div>
-            <button onclick="window.googleLogin()" class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 rounded-xl transition shadow-lg">
-                <i class="fa-brands fa-google text-rose-500"></i>
-                Sign in with Google
-            </button>
+            <div id="google-signin-button" class="w-full flex justify-center"></div>
             <button onclick="window.playAsGuest()" class="w-full flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl transition shadow-lg">
                 <i class="fa-solid fa-user-secret"></i>
                 Continue as Guest (Local Save)
@@ -1063,6 +1060,37 @@
             }
         }
 
+        function renderGoogleSignInButton() {
+            const target = document.getElementById('google-signin-button');
+            if (!target) return;
+
+            if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+                target.innerHTML = '<button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 rounded-xl transition shadow-lg" onclick="window.googleLogin()"><i class="fa-brands fa-google text-rose-500"></i><span>Sign in with Google</span></button>';
+                return;
+            }
+
+            const configuredClientId = (window.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID || '').trim();
+            if (!configuredClientId || configuredClientId.includes('YOUR_GOOGLE_CLIENT_ID')) {
+                target.innerHTML = '<button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 rounded-xl transition shadow-lg" onclick="window.googleLogin()"><i class="fa-brands fa-google text-rose-500"></i><span>Sign in with Google</span></button>';
+                return;
+            }
+
+            google.accounts.id.initialize({
+                client_id: configuredClientId,
+                callback: window.handleGoogleCredentialResponse
+            });
+
+            google.accounts.id.renderButton(target, {
+                theme: 'outline',
+                size: 'large',
+                type: 'standard',
+                text: 'continue_with',
+                shape: 'pill',
+                logo_alignment: 'left',
+                width: 350
+            });
+        }
+
         function applyGoogleUserProfile(userData) {
             if (!userData) return;
 
@@ -1121,6 +1149,10 @@
                 }
             });
         };
+
+        window.addEventListener('load', function() {
+            renderGoogleSignInButton();
+        });
 
         window.playAsGuest = function() {
             document.getElementById('modal-login').classList.add('hidden');
