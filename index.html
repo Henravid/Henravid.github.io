@@ -78,12 +78,10 @@
             </div>
             <div class="space-y-2">
                 <h2 class="font-display text-3xl font-extrabold text-white">Soccer Career Sim</h2>
-                <p class="text-sm text-slate-400">Sign in to save your progress or play directly in Guest Mode.</p>
             </div>
-            <div id="google-signin-button" class="w-full flex justify-center"></div>
-            <button onclick="window.playAsGuest()" class="w-full flex items-center justify-center gap-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl transition shadow-lg">
-                <i class="fa-solid fa-user-secret"></i>
-                Continue as Guest (Local Save)
+            <button onclick="window.playAsGuest()" class="w-full flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-500/30">
+                <i class="fa-solid fa-play"></i>
+                Play
             </button>
             <div id="login-error-msg" class="hidden text-rose-400 text-xs font-semibold mt-2"></div>
         </div>
@@ -170,8 +168,8 @@
                 </button>
 
                 <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-left font-medium">
-                    <i class="fa-solid fa-calendar-days w-5 text-center text-lg text-indigo-400"></i>
-                    <span class="hidden md:inline">Season Calendar</span>
+                    <i class="fa-solid fa-ranking-star w-5 text-center text-lg text-indigo-400"></i>
+                    <span class="hidden md:inline">League Info</span>
                 </button>
 
                 <button onclick="switchTab('matchday')" id="nav-matchday" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-left font-medium">
@@ -223,7 +221,7 @@
                         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div class="space-y-2 text-center md:text-left">
                                 <span class="bg-emerald-500/20 text-emerald-400 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider">Upcoming Fixture</span>
-                                <h2 id="dash-next-match-title" class="font-display text-2xl md:text-3xl font-bold text-white">London Blues vs Red Devils</h2>
+                                <h2 id="dash-next-match-title" class="font-display text-2xl md:text-3xl font-bold text-white">London Blues vs Manchester Blue</h2>
                                 <p id="dash-next-match-sub" class="text-slate-300 text-sm">Premier League • Week 1</p>
                             </div>
                             <div class="flex items-center gap-3">
@@ -300,9 +298,9 @@
                         <div class="flex items-center justify-between">
                             <h3 class="font-display text-lg font-bold text-slate-100 flex items-center gap-2">
                                 <i class="fa-solid fa-list-ol text-amber-400"></i>
-                                League Standings (6 Teams)
+                                <span id="dash-league-title">League Standings (20 Teams)</span>
                             </h3>
-                            <span class="text-xs text-slate-400 font-mono">10 Matchdays</span>
+                            <span id="dash-matchday-count" class="text-xs text-slate-400 font-mono">38 Matchdays</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-xs text-left">
@@ -311,9 +309,8 @@
                                         <th class="p-2">#</th>
                                         <th class="p-2">Club</th>
                                         <th class="p-2 text-center">OVR</th>
-                                        <th class="p-2 text-center">P</th>
                                         <th class="p-2 text-center">GD</th>
-                                        <th class="p-2 text-right">Pts</th>
+                                        <th class="p-2 text-right">PTS</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dash-league-tbody" class="divide-y divide-slate-800 font-medium">
@@ -336,35 +333,62 @@
                 </div>
             </section>
 
-            <!-- TAB 2: SEASON CALENDAR -->
+            <!-- TAB 2: LEAGUE INFO -->
             <section id="tab-calendar" class="tab-content hidden space-y-6">
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                         <h2 class="font-display text-2xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-days text-indigo-400"></i> Full Season Fixture Calendar
+                            <i class="fa-solid fa-ranking-star text-indigo-400"></i> League Info
                         </h2>
-                        <p class="text-xs text-slate-400">Double Round-Robin Schedule: 6 Teams • 10 Rounds • 30 Matches Total</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400">Filter Week:</span>
-                        <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
-                            <option value="all">All Weeks (1 - 10)</option>
-                            <option value="1">Week 1</option>
-                            <option value="2">Week 2</option>
-                            <option value="3">Week 3</option>
-                            <option value="4">Week 4</option>
-                            <option value="5">Week 5</option>
-                            <option value="6">Week 6</option>
-                            <option value="7">Week 7</option>
-                            <option value="8">Week 8</option>
-                            <option value="9">Week 9</option>
-                            <option value="10">Week 10</option>
-                        </select>
+                        <p class="text-xs text-slate-400">Standings and fixtures for all teams</p>
                     </div>
                 </div>
 
-                <div id="calendar-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Dynamic Fixtures Cards -->
+                <div class="flex gap-2 border-b border-slate-800" role="tablist" aria-label="League information">
+                    <button id="league-info-tab-table" onclick="switchLeagueInfoTab('table')" role="tab" aria-selected="true" aria-controls="league-info-panel-table" class="league-info-tab border-b-2 border-emerald-400 px-4 py-2 text-sm font-bold text-white">League Table</button>
+                    <button id="league-info-tab-fixtures" onclick="switchLeagueInfoTab('fixtures')" role="tab" aria-selected="false" aria-controls="league-info-panel-fixtures" class="league-info-tab border-b-2 border-transparent px-4 py-2 text-sm font-bold text-slate-400 hover:text-white">Season Fixtures</button>
+                </div>
+
+                <div id="league-info-panel-table" role="tabpanel" aria-labelledby="league-info-tab-table" class="overflow-x-auto">
+                    <table class="w-full min-w-[960px] text-xs text-left">
+                        <thead class="text-[10px] text-slate-400 uppercase bg-slate-900/60">
+                            <tr>
+                                <th class="p-2">#</th>
+                                <th class="p-2">Club</th>
+                                <th class="p-2 text-center">OFF</th>
+                                <th class="p-2 text-center">MID</th>
+                                <th class="p-2 text-center">DEF</th>
+                                <th class="p-2 text-center">OVR</th>
+                                <th class="p-2 text-center">P</th>
+                                <th class="p-2 text-center">W</th>
+                                <th class="p-2 text-center">D</th>
+                                <th class="p-2 text-center">L</th>
+                                <th class="p-2 text-center">GF</th>
+                                <th class="p-2 text-center">GA</th>
+                                <th class="p-2 text-center">GD</th>
+                                <th class="p-2 text-right">PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="league-info-tbody" class="divide-y divide-slate-800 font-medium"></tbody>
+                    </table>
+                </div>
+
+                <div id="league-info-panel-fixtures" role="tabpanel" aria-labelledby="league-info-tab-fixtures" class="hidden space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <h3 class="font-display text-lg font-bold text-white">Season Fixtures</h3>
+                            <p id="fixture-season-summary" class="text-xs text-slate-400">Double round-robin: 20 teams, 38 rounds, 380 matches</p>
+                        </div>
+                        <label class="flex items-center gap-2 text-xs text-slate-400">
+                            Week:
+                            <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
+                                <option value="all">All Weeks</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div id="calendar-grid" class="space-y-6">
+                        <!-- Dynamic Fixtures Cards -->
+                    </div>
                 </div>
             </section>
 
@@ -390,7 +414,7 @@
 
                     <div class="flex items-center gap-4 w-1/3 justify-end text-right">
                         <div>
-                            <div id="match-away-name" class="font-display text-lg font-bold">Red Devils</div>
+                            <div id="match-away-name" class="font-display text-lg font-bold">Manchester Blue</div>
                             <div id="match-away-label" class="text-xs text-slate-400">Away</div>
                         </div>
                         <div id="match-away-logo" class="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-display text-xl font-bold text-rose-400">RD</div>
@@ -650,7 +674,7 @@
         <div class="bg-fm-card border border-fm-border rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl text-center">
             <div class="space-y-2 border-b border-slate-800 pb-4">
                 <span class="bg-slate-800 text-slate-300 text-xs px-3 py-1 rounded-full uppercase font-bold tracking-wider">Full Time Result</span>
-                <h3 id="post-match-score" class="font-display text-3xl font-extrabold text-white mt-2">London Blues 2 - 1 Red Devils</h3>
+                <h3 id="post-match-score" class="font-display text-3xl font-extrabold text-white mt-2">London Blues 2 - 1 Manchester Blue</h3>
             </div>
 
             <div class="grid grid-cols-3 gap-3 text-center">
@@ -689,21 +713,22 @@
 
     <!-- MODAL: END OF SEASON SUMMARY -->
     <div id="modal-end-season" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-        <div class="bg-fm-card border-2 border-indigo-500/50 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl text-center">
-            <div class="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto border border-indigo-500/30">
-                <i class="fa-solid fa-trophy text-3xl text-amber-400"></i>
-            </div>
-            
-            <div class="space-y-2 border-b border-slate-800 pb-4">
-                <h2 id="end-season-title" class="font-display text-3xl font-extrabold text-white">Season 1 Complete!</h2>
-                <p id="end-season-sub" class="text-xs text-slate-400">All 10 fixtures played across the league.</p>
+        <div class="bg-fm-card border-2 border-indigo-500/50 rounded-2xl max-w-6xl w-full h-[95vh] max-h-[900px] p-4 md:p-5 flex flex-col gap-3 shadow-2xl overflow-hidden">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 shrink-0">
+                <div class="w-10 h-10 bg-indigo-500/10 rounded-full flex items-center justify-center border border-indigo-500/30 shrink-0">
+                    <i class="fa-solid fa-trophy text-xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h2 id="end-season-title" class="font-display text-2xl font-extrabold text-white">Season 1 Complete!</h2>
+                    <p id="end-season-sub" class="text-xs text-slate-400">All league fixtures completed.</p>
+                </div>
             </div>
 
-            <div id="end-season-summary-card" class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 text-left space-y-3">
+            <div id="end-season-summary-card" class="flex flex-col gap-3 flex-1 min-h-0">
                 <!-- Summary Dynamic Content -->
             </div>
 
-            <button onclick="startNextSeason()" class="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold py-3.5 rounded-xl transition shadow-lg">
+            <button onclick="startNextSeason()" class="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold py-3 rounded-xl transition shadow-lg shrink-0">
                 Advance to Next Season
             </button>
         </div>
@@ -752,12 +777,26 @@
                 <div>
                     <label class="block text-xs font-bold text-emerald-400 uppercase mb-1">Starting Club</label>
                     <select id="create-club" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white">
-                        <option value="Madrid White">Madrid White (92 OVR - Elite)</option>
-                        <option value="Munich Knights">Munich Knights (88 OVR - Great)</option>
-                        <option value="London Blues" selected>London Blues (84 OVR - Good)</option>
-                        <option value="Red Devils">Red Devils (81 OVR - Good)</option>
-                        <option value="Milan Red">Milan Red (77 OVR - Good)</option>
-                        <option value="Milan Blue">Milan Blue (72 OVR - Poor)</option>
+                        <option value="Manchester Blue">Manchester Blue</option>
+                        <option value="London Red Cannons">London Red Cannons</option>
+                        <option value="Brighton Birds">Brighton Birds</option>
+                        <option value="Merseyside Red">Merseyside Red</option>
+                        <option value="London Blues" selected>London Blues</option>
+                        <option value="West London Bees">West London Bees</option>
+                        <option value="Leeds Leopards">Leeds Leopards</option>
+                        <option value="Tyne Black">Tyne Black</option>
+                        <option value="Aston Lions">Aston Lions</option>
+                        <option value="Hull Tigers">Hull Tigers</option>
+                        <option value="Merseyside Blue">Merseyside Blue</option>
+                        <option value="East Anglia Blue">East Anglia Blue</option>
+                        <option value="Bournemouth Cherries">Bournemouth Cherries</option>
+                        <option value="London White">London White</option>
+                        <option value="West London Badgers">West London Badgers</option>
+                        <option value="Manchester Red">Manchester Red</option>
+                        <option value="South London Eagles">South London Eagles</option>
+                        <option value="Nottingham Red Trees">Nottingham Red Trees</option>
+                        <option value="Coventry Phoenix">Coventry Phoenix</option>
+                        <option value="Tyne Red">Tyne Red</option>
                     </select>
                 </div>
 
@@ -852,20 +891,66 @@
             }
         }
 
-        // --- ALL 6 LEAGUE TEAMS WITH OVERALL RATINGS ---
-        // Categories: Elite (90+), Great (85-90), Good (75-85), Poor (<75)
+        // --- LEAGUE TEAMS ---
         const DEFAULT_TEAMS = [
-            { name: "Madrid White", ovr: 92 },   // Elite
-            { name: "Munich Knights", ovr: 88 }, // Great
-            { name: "London Blues", ovr: 84 },   // Good
-            { name: "Red Devils", ovr: 81 },     // Good
-            { name: "Milan Red", ovr: 77 },      // Good
-            { name: "Milan Blue", ovr: 72 }      // Poor
+            { name: "Manchester Blue" },
+            { name: "London Red Cannons" },
+            { name: "Brighton Birds" },
+            { name: "Merseyside Red" },
+            { name: "London Blues" },
+            { name: "West London Bees" },
+            { name: "Leeds Leopards" },
+            { name: "Tyne Black" },
+            { name: "Aston Lions" },
+            { name: "Hull Tigers" },
+            { name: "Merseyside Blue" },
+            { name: "East Anglia Blue" },
+            { name: "Bournemouth Cherries" },
+            { name: "London White" },
+            { name: "West London Badgers" },
+            { name: "Manchester Red" },
+            { name: "South London Eagles" },
+            { name: "Nottingham Red Trees" },
+            { name: "Coventry Phoenix" },
+            { name: "Tyne Red" }
         ];
+        const ROUNDS_PER_LEG = DEFAULT_TEAMS.length % 2 === 0 ? DEFAULT_TEAMS.length - 1 : DEFAULT_TEAMS.length;
+        const TOTAL_SEASON_WEEKS = ROUNDS_PER_LEG * 2;
+        const TOTAL_SEASON_MATCHES = DEFAULT_TEAMS.length * (DEFAULT_TEAMS.length - 1);
+        let teamRatingsNeedSave = false;
+
+        function createTeamRatings() {
+            const offense = Math.floor(Math.random() * 31) + 70;
+            const minMidfield = Math.max(70, offense - 15);
+            const maxMidfield = Math.min(100, offense + 15);
+            const midfield = Math.floor(Math.random() * (maxMidfield - minMidfield + 1)) + minMidfield;
+            const minDefense = Math.max(70, offense - 15, midfield - 15);
+            const maxDefense = Math.min(100, offense + 15, midfield + 15);
+            const defense = Math.floor(Math.random() * (maxDefense - minDefense + 1)) + minDefense;
+            return { offense, midfield, defense, ovr: Math.round((offense + midfield + defense) / 3) };
+        }
+
+        function createLeagueTeams() {
+            return DEFAULT_TEAMS.map(team => ({
+                name: team.name,
+                ...createTeamRatings(),
+                pts: 0,
+                p: 0,
+                gf: 0,
+                ga: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0
+            }));
+        }
 
         function getTeamOvr(teamName) {
-            const found = DEFAULT_TEAMS.find(t => t.name === teamName);
+            const found = gameState.league.find(team => team.name === teamName);
             return found ? found.ovr : 75;
+        }
+
+        function getTeamRatings(teamName) {
+            return gameState.league.find(team => team.name === teamName) || { offense: 75, defense: 75, ovr: 75 };
         }
 
         // --- GAME STATE ---
@@ -893,14 +978,14 @@
                 totals: { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0, trophies: 0 },
                 matchHistory: []
             },
-            league: DEFAULT_TEAMS.map(t => ({ name: t.name, ovr: t.ovr, pts: 0, p: 0, gf: 0, ga: 0, wins: 0, draws: 0, losses: 0 })),
+            league: createLeagueTeams(),
             schedule: [],
             news: [
                 { title: "Season Kickoff Imminent!", desc: "Management expects great development from young prospects this season.", date: "Week 1" }
             ],
             transfers: [
-                { club: "Munich Knights", offerWage: 32000, offerFee: 18000000, status: "Interested" },
-                { club: "Milan Red", offerWage: 28000, offerFee: 15500000, status: "Scouting" }
+                { club: "Manchester Blue", offerWage: 32000, offerFee: 18000000, status: "Interested" },
+                { club: "Merseyside Red", offerWage: 28000, offerFee: 15500000, status: "Scouting" }
             ]
         };
 
@@ -915,8 +1000,13 @@
             awayScore: 0,
             speed: 1,
             timerId: null,
-            opponent: "Red Devils",
+            opponent: "Manchester Blue",
             isHome: true,
+            chanceEvents: [],
+            chanceEventIndex: 0,
+            pendingChance: null,
+            decisionUsed: false,
+            quickSim: false,
             playerStats: { goals: 0, assists: 0, shots: 0, rating: 6.5 }
         };
 
@@ -942,64 +1032,68 @@
 
         // --- DOUBLE ROUND-ROBIN SCHEDULE GENERATOR ---
         function generateSeasonSchedule() {
-            const teams = DEFAULT_TEAMS.map(t => t.name); // 6 teams
+            const teams = DEFAULT_TEAMS.map(t => t.name);
             const schedule = [];
-            
-            // Berger round-robin algorithm for 6 teams (5 rounds for 1st half)
-            const rotating = teams.slice(1); // 5 teams
-            const numRounds = teams.length - 1; // 5
-            
-            // First Half (Weeks 1 to 5)
+
+            const rotating = [...teams];
+            if (rotating.length % 2 !== 0) rotating.push(null);
+            const numRounds = rotating.length - 1;
+
             for (let r = 0; r < numRounds; r++) {
-                const weekNum = r + 1;
                 const weekMatches = [];
-                
-                const rot = [];
-                for (let i = 0; i < rotating.length; i++) {
-                    rot.push(rotating[(i + r) % rotating.length]);
+
+                for (let i = 0; i < rotating.length / 2; i++) {
+                    let home = rotating[i];
+                    let away = rotating[rotating.length - 1 - i];
+                    if (!home || !away) continue;
+
+                    if ((r + i) % 2 !== 0) [home, away] = [away, home];
+                    weekMatches.push({ home, away, homeScore: null, awayScore: null, played: false });
                 }
-                
-                // Match 1: fixed team teams[0] vs rot[0]
-                if (r % 2 === 0) {
-                    weekMatches.push({ home: teams[0], away: rot[0], homeScore: null, awayScore: null, played: false });
-                } else {
-                    weekMatches.push({ home: rot[0], away: teams[0], homeScore: null, awayScore: null, played: false });
-                }
-                
-                // Match 2: rot[1] vs rot[4]
-                weekMatches.push({ home: rot[1], away: rot[4], homeScore: null, awayScore: null, played: false });
-                
-                // Match 3: rot[2] vs rot[3]
-                weekMatches.push({ home: rot[2], away: rot[3], homeScore: null, awayScore: null, played: false });
-                
-                schedule.push({ week: weekNum, matches: weekMatches });
+
+                schedule.push({ week: r + 1, matches: weekMatches });
+
+                const lastTeam = rotating.pop();
+                rotating.splice(1, 0, lastTeam);
             }
-            
-            // Second Half (Weeks 6 to 10): Reverse Home and Away for all matches
+
             for (let r = 0; r < numRounds; r++) {
                 const weekNum = r + 1 + numRounds;
-                const firstHalfMatches = schedule[r].matches;
-                const weekMatches = firstHalfMatches.map(m => ({
-                    home: m.away,
-                    away: m.home,
+                const weekMatches = schedule[r].matches.map(match => ({
+                    home: match.away,
+                    away: match.home,
                     homeScore: null,
                     awayScore: null,
                     played: false
                 }));
                 schedule.push({ week: weekNum, matches: weekMatches });
             }
-            
+
             return schedule;
         }
 
         // --- INITIALIZATION ---
         window.onload = function() {
             loadSavedGame();
-            
-            // Ensure schedule exists & league has 6 teams with OVR
-            if (!gameState.schedule || gameState.schedule.length === 0 || gameState.league.length < 6) {
-                gameState.league = DEFAULT_TEAMS.map(t => ({ name: t.name, ovr: t.ovr, pts: 0, p: 0, gf: 0, ga: 0, wins: 0, draws: 0, losses: 0 }));
+
+            const hasCurrentTeams = Array.isArray(gameState.league) && gameState.league.length === DEFAULT_TEAMS.length &&
+                DEFAULT_TEAMS.every(team => gameState.league.some(leagueTeam => leagueTeam.name === team.name));
+            const hasCurrentSchedule = Array.isArray(gameState.schedule) && gameState.schedule.length === TOTAL_SEASON_WEEKS &&
+                gameState.schedule.every(week => week.matches.length === DEFAULT_TEAMS.length / 2);
+            const migratedLeague = !hasCurrentTeams || !hasCurrentSchedule;
+
+            if (migratedLeague) {
+                gameState.league = createLeagueTeams();
                 gameState.schedule = generateSeasonSchedule();
+                gameState.transfers = [
+                    { club: "Manchester Blue", offerWage: 32000, offerFee: 18000000, status: "Interested" },
+                    { club: "Merseyside Red", offerWage: 28000, offerFee: 15500000, status: "Scouting" }
+                ];
+                gameState.career.week = 1;
+                gameState.career.pressAnswered = false;
+                if (!DEFAULT_TEAMS.some(team => team.name === gameState.player.club)) {
+                    gameState.player.club = DEFAULT_TEAMS[0].name;
+                }
             }
 
             recalculateLeagueTable();
@@ -1007,6 +1101,7 @@
             initRadarChart();
             renderDrills();
             renderPressScenario();
+            if (migratedLeague || teamRatingsNeedSave) saveGame();
         };
 
         // --- AUTH & PLAY MODES ---
@@ -1064,14 +1159,14 @@
             const target = document.getElementById('google-signin-button');
             if (!target) return;
 
+            target.innerHTML = '';
+
             if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-                target.innerHTML = '<button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 rounded-xl transition shadow-lg" onclick="window.googleLogin()"><i class="fa-brands fa-google text-rose-500"></i><span>Sign in with Google</span></button>';
                 return;
             }
 
             const configuredClientId = (window.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID || '').trim();
             if (!configuredClientId || configuredClientId.includes('YOUR_GOOGLE_CLIENT_ID')) {
-                target.innerHTML = '<button class="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-bold py-3 rounded-xl transition shadow-lg" onclick="window.googleLogin()"><i class="fa-brands fa-google text-rose-500"></i><span>Sign in with Google</span></button>';
                 return;
             }
 
@@ -1187,7 +1282,26 @@
                 renderDrills();
             } else if (tabId === 'calendar') {
                 renderCalendarUI();
+                updateLeagueTableUI();
             }
+        };
+
+        window.switchLeagueInfoTab = function(tabId) {
+            const isTable = tabId === 'table';
+            const tablePanel = document.getElementById('league-info-panel-table');
+            const fixturesPanel = document.getElementById('league-info-panel-fixtures');
+            const tableTab = document.getElementById('league-info-tab-table');
+            const fixturesTab = document.getElementById('league-info-tab-fixtures');
+
+            tablePanel.classList.toggle('hidden', !isTable);
+            fixturesPanel.classList.toggle('hidden', isTable);
+            tableTab.setAttribute('aria-selected', String(isTable));
+            fixturesTab.setAttribute('aria-selected', String(!isTable));
+            tableTab.className = `league-info-tab border-b-2 px-4 py-2 text-sm font-bold ${isTable ? 'border-emerald-400 text-white' : 'border-transparent text-slate-400 hover:text-white'}`;
+            fixturesTab.className = `league-info-tab border-b-2 px-4 py-2 text-sm font-bold ${isTable ? 'border-transparent text-slate-400 hover:text-white' : 'border-emerald-400 text-white'}`;
+
+            if (isTable) updateLeagueTableUI();
+            else renderCalendarUI();
         };
 
         // --- OVERALL RATING CALCULATION ---
@@ -1270,6 +1384,9 @@
             document.getElementById('header-position').innerText = p.position;
             document.getElementById('header-club-name').innerText = `${p.club} • Premier League`;
             document.getElementById('header-season-display').innerText = `Season ${c.season}, Week ${c.week}`;
+            document.getElementById('dash-league-title').innerText = `League Standings (${gameState.league.length} Teams)`;
+            document.getElementById('dash-matchday-count').innerText = `${gameState.schedule.length} Matchdays`;
+            document.getElementById('fixture-season-summary').innerText = `Double round-robin: ${DEFAULT_TEAMS.length} teams, ${TOTAL_SEASON_WEEKS} rounds, ${TOTAL_SEASON_MATCHES} matches`;
 
             document.getElementById('metric-morale').innerText = `${p.morale}%`;
             document.getElementById('metric-energy').innerText = `${p.energy}%`;
@@ -1327,28 +1444,49 @@
 
         // --- LEAGUE TABLE UI ---
         function updateLeagueTableUI() {
-            const tbody = document.getElementById('dash-league-tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            const bodies = ['dash-league-tbody', 'league-info-tbody']
+                .map(id => document.getElementById(id))
+                .filter(Boolean);
+            if (!bodies.length) return;
+            bodies.forEach(tbody => tbody.innerHTML = '');
 
             const sorted = [...gameState.league].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf);
+            const userIndex = sorted.findIndex(team => team.name === gameState.player.club);
+            const dashboardIndices = new Set(Array.from({ length: Math.min(5, sorted.length) }, (_, index) => index));
+            if (userIndex >= 5) {
+                for (let index = userIndex - 1; index <= userIndex + 1 && index < sorted.length; index++) {
+                    dashboardIndices.add(index);
+                }
+            }
 
-            sorted.forEach((team, idx) => {
-                const tr = document.createElement('tr');
-                const isUser = team.name === gameState.player.club;
-                const ovr = team.ovr || getTeamOvr(team.name);
-                const badgeClass = ovr >= 90 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : ovr >= 85 ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30' : ovr >= 75 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700';
+            bodies.forEach(tbody => {
+                const detailed = tbody.id === 'league-info-tbody';
+                const visibleIndices = detailed ? sorted.map((_, index) => index) : [...dashboardIndices].sort((a, b) => a - b);
 
-                tr.className = isUser ? 'bg-emerald-500/10 text-emerald-400 font-bold' : 'hover:bg-slate-800/40';
-                tr.innerHTML = `
-                    <td class="p-2 font-mono">${idx + 1}</td>
-                    <td class="p-2">${team.name} ${isUser ? '⭐' : ''}</td>
-                    <td class="p-2 text-center"><span class="px-1.5 py-0.5 text-[10px] rounded font-bold border ${badgeClass}">${ovr}</span></td>
-                    <td class="p-2 text-center font-mono">${team.p}</td>
-                    <td class="p-2 text-center font-mono">${team.gf - team.ga}</td>
-                    <td class="p-2 text-right font-bold font-mono">${team.pts}</td>
-                `;
-                tbody.appendChild(tr);
+                visibleIndices.forEach((idx, visibleIndex) => {
+                    if (!detailed && visibleIndex > 0 && idx > visibleIndices[visibleIndex - 1] + 1) {
+                        const gapRow = document.createElement('tr');
+                        gapRow.innerHTML = '<td colspan="5" class="p-1 text-center text-slate-500">···</td>';
+                        tbody.appendChild(gapRow);
+                    }
+
+                    const team = sorted[idx];
+                    const isUser = team.name === gameState.player.club;
+                    const ovr = team.ovr ?? getTeamOvr(team.name);
+                    const badgeClass = ovr >= 90 ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : ovr >= 85 ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30' : ovr >= 75 ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700';
+                    const tr = document.createElement('tr');
+                    tr.className = isUser ? 'bg-emerald-500/10 text-emerald-400 font-bold' : 'hover:bg-slate-800/40';
+                    tr.innerHTML = `
+                        <td class="p-2 font-mono">${idx + 1}</td>
+                        <td class="p-2">${team.name} ${isUser ? '⭐' : ''}</td>
+                        ${detailed ? `<td class="p-2 text-center">${team.offense}</td><td class="p-2 text-center">${team.midfield}</td><td class="p-2 text-center">${team.defense}</td>` : ''}
+                        <td class="p-2 text-center"><span class="px-1.5 py-0.5 text-[10px] rounded font-bold border ${badgeClass}">${ovr}</span></td>
+                        ${detailed ? `<td class="p-2 text-center font-mono">${team.p}</td><td class="p-2 text-center font-mono">${team.wins}</td><td class="p-2 text-center font-mono">${team.draws}</td><td class="p-2 text-center font-mono">${team.losses}</td><td class="p-2 text-center font-mono">${team.gf}</td><td class="p-2 text-center font-mono">${team.ga}</td>` : ''}
+                        <td class="p-2 text-center font-mono">${team.gf - team.ga}</td>
+                        <td class="p-2 text-right font-bold font-mono">${team.pts}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             });
         }
 
@@ -1512,23 +1650,43 @@
             const grid = document.getElementById('calendar-grid');
             const filter = document.getElementById('calendar-week-filter');
             if (!grid || !filter) return;
-            
+
+            const previousSelection = filter.value;
+            filter.innerHTML = '<option value="all">All Weeks</option>';
+            gameState.schedule.forEach(week => {
+                const option = document.createElement('option');
+                option.value = String(week.week);
+                option.textContent = `Week ${week.week}`;
+                filter.appendChild(option);
+            });
+            filter.value = [...filter.options].some(option => option.value === previousSelection) ? previousSelection : 'all';
+
             grid.innerHTML = '';
             const selectedWeek = filter.value;
-            
+
             gameState.schedule.forEach(w => {
                 if (selectedWeek !== 'all' && parseInt(selectedWeek) !== w.week) return;
-                
+
+                const weekSection = document.createElement('section');
+                weekSection.className = 'space-y-3';
+                weekSection.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="font-display text-lg font-bold text-white">Week ${w.week}</h3>
+                        <span class="text-xs text-slate-400">${w.matches.length} matches</span>
+                    </div>
+                `;
+                const matchesGrid = document.createElement('div');
+                matchesGrid.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3';
+
                 w.matches.forEach(m => {
                     const isUser = m.home === gameState.player.club || m.away === gameState.player.club;
                     const userHighlight = isUser ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-slate-800 bg-slate-900';
-                    
+
                     let scoreText = 'vs';
                     if (m.played) scoreText = `${m.homeScore} - ${m.awayScore}`;
-                    
-                    grid.innerHTML += `
+
+                    matchesGrid.innerHTML += `
                         <div class="p-4 rounded-xl border ${userHighlight} flex flex-col justify-center text-center space-y-2">
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">Week ${w.week}</div>
                             <div class="flex justify-between items-center text-sm font-bold">
                                 <span class="${m.home === gameState.player.club ? 'text-emerald-400' : 'text-slate-200'}">${m.home}</span>
                                 <span class="px-2 py-1 bg-slate-800 rounded text-slate-300 font-mono">${scoreText}</span>
@@ -1537,11 +1695,16 @@
                         </div>
                     `;
                 });
+
+                weekSection.appendChild(matchesGrid);
+                grid.appendChild(weekSection);
             });
         };
 
         window.startMatchSimulation = function() {
             if (matchEngine.active) return;
+
+            window.setSpeed(1);
             
             matchEngine.active = true;
             matchEngine.paused = false;
@@ -1549,6 +1712,12 @@
             matchEngine.homeScore = 0;
             matchEngine.awayScore = 0;
             matchEngine.playerStats = { goals: 0, assists: 0, shots: 0, rating: 6.0 };
+            const homeTeam = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
+            const awayTeam = matchEngine.isHome ? matchEngine.opponent : gameState.player.club;
+            matchEngine.chanceEvents = simulateTeamMatch(homeTeam, awayTeam).events;
+            matchEngine.chanceEventIndex = 0;
+            matchEngine.pendingChance = null;
+            matchEngine.decisionUsed = false;
             
             document.getElementById('match-status-label').innerText = "LIVE";
             document.getElementById('match-score-home').innerText = 0;
@@ -1571,16 +1740,11 @@
                 document.getElementById('match-timer').innerText = `${matchEngine.minute}:00`;
                 
                 simulateMatchEvent();
+                if (matchEngine.paused) return;
                 
                 if (matchEngine.minute === 45) {
                     const log = document.getElementById('commentary-log');
                     if (log) log.innerHTML += `<div class="text-amber-400 font-bold">45' Half-time whistle!</div>`;
-                }
-                
-                // Random Decision Encounter Logic
-                if (matchEngine.minute > 20 && matchEngine.minute < 80 && Math.random() < 0.05) {
-                    triggerDecisionModal();
-                    return; // Pause the loop to let the user answer
                 }
                 
                 if (matchEngine.minute >= 90) {
@@ -1591,75 +1755,112 @@
             }, 1000 / matchEngine.speed);
         }
 
-        // --- MATCH ENGINE CALCULATION HELPER ---
-        function calculateMatchProbabilities(homeTeamName, awayTeamName) {
-            const homeOvr = getTeamOvr(homeTeamName);
-            const awayOvr = getTeamOvr(awayTeamName);
-            
-            // 10% performance boost for Home Field Advantage (internal factor)
-            const homePower = homeOvr * 1.10;
-            const awayPower = awayOvr;
-            
-            const homeChance = homePower / (homePower + awayPower);
-            return { homeOvr, awayOvr, homePower, awayPower, homeChance };
+        // --- MATCH ENGINE CALCULATION HELPERS ---
+        function randomInteger(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function simulateMatchEvent() {
-            const homeTeam = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
-            const awayTeam = matchEngine.isHome ? matchEngine.opponent : gameState.player.club;
-            
-            const { homePower, awayPower, homeChance } = calculateMatchProbabilities(homeTeam, awayTeam);
-            
-            // Determine attacking side based on team power & home advantage
-            const isHomeAttack = Math.random() < homeChance;
-            const isUserTeamAttack = (matchEngine.isHome && isHomeAttack) || (!matchEngine.isHome && !isHomeAttack);
+        function simulateTeamMatch(homeTeamName, awayTeamName) {
+            const homeRatings = getTeamRatings(homeTeamName);
+            const awayRatings = getTeamRatings(awayTeamName);
+            const getChanceCount = (attackingRatings, defendingRatings) => Math.max(0, Math.round(
+                6 + (attackingRatings.midfield - defendingRatings.midfield) / 10 + randomInteger(-2, 2)
+            ));
+            const homeChances = getChanceCount(homeRatings, awayRatings);
+            const awayChances = getChanceCount(awayRatings, homeRatings);
+            const events = [];
+            const availableMinutes = Array.from({ length: 90 }, (_, index) => index + 1);
 
-            // Goal conversion chance scaled by relative team strengths
-            const attackingPower = isHomeAttack ? homePower : awayPower;
-            const defendingPower = isHomeAttack ? awayPower : homePower;
-            const baseGoalProb = 0.22 * Math.pow(attackingPower / defendingPower, 1.2);
-            const isGoal = Math.random() < baseGoalProb;
+            const createChanceEvents = (attackingTeam, defendingTeam, attackingRatings, defendingRatings, chanceCount) => {
+                for (let chance = 0; chance < chanceCount; chance++) {
+                    const goalPercentage = Math.min(100, Math.max(0,
+                        40 * (12 * attackingRatings.offense / (13 * defendingRatings.defense)) + randomInteger(-5, 5)
+                    ));
+                    const minuteIndex = randomInteger(0, availableMinutes.length - 1);
+                    const [minute] = availableMinutes.splice(minuteIndex, 1);
+                    events.push({
+                        minute,
+                        attackingTeam,
+                        defendingTeam,
+                        goalPercentage,
+                        isGoal: Math.random() < goalPercentage / 100
+                    });
+                }
+            };
 
+            createChanceEvents(homeTeamName, awayTeamName, homeRatings, awayRatings, homeChances);
+            createChanceEvents(awayTeamName, homeTeamName, awayRatings, homeRatings, awayChances);
+            events.sort((a, b) => a.minute - b.minute);
+
+            return {
+                homeScore: events.filter(event => event.attackingTeam === homeTeamName && event.isGoal).length,
+                awayScore: events.filter(event => event.attackingTeam === awayTeamName && event.isGoal).length,
+                homeChances,
+                awayChances,
+                events
+            };
+        }
+
+        function processMatchChance(chanceEvent, decisionType = null) {
             const log = document.getElementById('commentary-log');
-            if (!log) return;
+            const isUserTeamAttack = chanceEvent.attackingTeam === gameState.player.club;
+            const homeTeamName = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
 
-            if (isGoal) {
+            if (isUserTeamAttack) matchEngine.playerStats.shots++;
+
+            if (chanceEvent.isGoal) {
+                if (chanceEvent.attackingTeam === homeTeamName) {
+                    matchEngine.homeScore++;
+                } else {
+                    matchEngine.awayScore++;
+                }
+
                 if (isUserTeamAttack) {
-                    if (matchEngine.isHome) matchEngine.homeScore++;
-                    else matchEngine.awayScore++;
-
-                    const userGoal = Math.random() < 0.45;
-                    if (userGoal) {
+                    if (decisionType === 'pass') {
+                        matchEngine.playerStats.assists++;
+                        matchEngine.playerStats.rating += 0.7;
+                        if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' GOAL! ${gameState.player.name} creates the chance for a teammate.</div>`;
+                    } else if (decisionType === 'power' || decisionType === 'chip' || Math.random() < 0.45) {
                         matchEngine.playerStats.goals++;
                         matchEngine.playerStats.rating += 0.8;
-                        soundFx.playGoal();
-                        log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' GOAL! ${gameState.player.name} scores a brilliant shot!</div>`;
-                    } else {
-                        log.innerHTML += `<div class="text-emerald-300">${matchEngine.minute}' GOAL! ${gameState.player.club} scores!</div>`;
+                        if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' GOAL! ${gameState.player.name} scores!</div>`;
+                    } else if (log) {
+                        log.innerHTML += `<div class="text-emerald-300">${matchEngine.minute}' GOAL! ${gameState.player.club} scores.</div>`;
                     }
-                } else {
-                    if (matchEngine.isHome) matchEngine.awayScore++;
-                    else matchEngine.homeScore++;
-
-                    const scoringClub = matchEngine.isHome ? matchEngine.opponent : gameState.player.club;
-                    log.innerHTML += `<div class="text-rose-400">${matchEngine.minute}' GOAL! ${scoringClub} scores!</div>`;
+                } else if (log) {
+                    log.innerHTML += `<div class="text-rose-400">${matchEngine.minute}' GOAL! ${chanceEvent.attackingTeam} scores.</div>`;
                 }
 
+                soundFx.playGoal();
                 document.getElementById('match-score-home').innerText = matchEngine.homeScore;
                 document.getElementById('match-score-away').innerText = matchEngine.awayScore;
-            } else {
-                if (isUserTeamAttack && Math.random() < 0.35) {
-                    matchEngine.playerStats.shots++;
-                    log.innerHTML += `<div class="text-slate-300">${matchEngine.minute}' Shot by ${gameState.player.name} saved by keeper.</div>`;
-                }
+            } else if (log) {
+                const missedChanceText = isUserTeamAttack
+                    ? `${gameState.player.name}'s chance is saved by the keeper.`
+                    : `${chanceEvent.attackingTeam}'s chance is saved by the keeper.`;
+                log.innerHTML += `<div class="text-slate-300">${matchEngine.minute}' ${missedChanceText}</div>`;
             }
 
             document.getElementById('live-goals').innerText = matchEngine.playerStats.goals;
             document.getElementById('live-assists').innerText = matchEngine.playerStats.assists;
             document.getElementById('live-shots').innerText = matchEngine.playerStats.shots;
             document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
+            if (log) log.scrollTop = log.scrollHeight;
+        }
 
-            log.scrollTop = log.scrollHeight;
+        function simulateMatchEvent() {
+            while (matchEngine.chanceEventIndex < matchEngine.chanceEvents.length &&
+                matchEngine.chanceEvents[matchEngine.chanceEventIndex].minute === matchEngine.minute) {
+                const chanceEvent = matchEngine.chanceEvents[matchEngine.chanceEventIndex++];
+                const isUserChance = chanceEvent.attackingTeam === gameState.player.club;
+                if (isUserChance && !matchEngine.quickSim && !matchEngine.decisionUsed && Math.random() < 0.25) {
+                    matchEngine.decisionUsed = true;
+                    matchEngine.pendingChance = chanceEvent;
+                    triggerDecisionModal();
+                    return;
+                }
+                processMatchChance(chanceEvent);
+            }
         }
 
         window.togglePauseMatch = function() {
@@ -1684,7 +1885,28 @@
 
         window.quickSimMatch = function() {
             if (!matchEngine.active) startMatchSimulation();
-            matchEngine.speed = 100;
+
+            clearTimeout(matchEngine.timerId);
+            matchEngine.paused = false;
+            matchEngine.quickSim = true;
+
+            const decisionModal = document.getElementById('modal-decision');
+            decisionModal.classList.add('hidden');
+            decisionModal.classList.remove('flex');
+
+            while (matchEngine.minute < 90) {
+                matchEngine.minute++;
+                document.getElementById('match-timer').innerText = `${matchEngine.minute}:00`;
+                simulateMatchEvent();
+
+                if (matchEngine.minute === 45) {
+                    const log = document.getElementById('commentary-log');
+                    if (log) log.innerHTML += `<div class="text-amber-400 font-bold">45' Half-time whistle!</div>`;
+                }
+            }
+
+            matchEngine.quickSim = false;
+            finishMatch();
         };
 
         function triggerDecisionModal() {
@@ -1711,29 +1933,10 @@
         window.resolveDecision = function(type) {
             document.getElementById('modal-decision').classList.add('hidden');
             document.getElementById('modal-decision').classList.remove('flex');
-
-            const log = document.getElementById('commentary-log');
-            if (type === 'power' || type === 'chip') {
-                if (Math.random() < 0.6) {
-                    matchEngine.homeScore++;
-                    matchEngine.playerStats.goals++;
-                    matchEngine.playerStats.rating += 1.0;
-                    soundFx.playGoal();
-                    if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' GOAL! Magnificent strike after taking the decision!</div>`;
-                } else {
-                    if (log) log.innerHTML += `<div class="text-amber-400">${matchEngine.minute}' Missed opportunity on goal!</div>`;
-                }
-            } else {
-                matchEngine.playerStats.assists++;
-                matchEngine.playerStats.rating += 0.7;
-                matchEngine.homeScore++;
-                if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' GREAT ASSIST! Teammate taps it in!</div>`;
+            if (matchEngine.pendingChance) {
+                processMatchChance(matchEngine.pendingChance, type);
+                matchEngine.pendingChance = null;
             }
-
-            document.getElementById('match-score-home').innerText = matchEngine.homeScore;
-            document.getElementById('live-goals').innerText = matchEngine.playerStats.goals;
-            document.getElementById('live-assists').innerText = matchEngine.playerStats.assists;
-            document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
 
             matchEngine.paused = false;
             runMatchLoop();
@@ -1811,22 +2014,9 @@
 
             weekData.matches.forEach(m => {
                 if (!m.played) {
-                    const { homePower, awayPower, homeChance } = calculateMatchProbabilities(m.home, m.away);
-                    let hGoals = 0;
-                    let aGoals = 0;
-
-                    for (let i = 0; i < 8; i++) {
-                        if (Math.random() < 0.32) {
-                            if (Math.random() < homeChance) {
-                                if (Math.random() < 0.22 * Math.pow(homePower / awayPower, 1.1)) hGoals++;
-                            } else {
-                                if (Math.random() < 0.22 * Math.pow(awayPower / homePower, 1.1)) aGoals++;
-                            }
-                        }
-                    }
-
-                    m.homeScore = hGoals;
-                    m.awayScore = aGoals;
+                    const result = simulateTeamMatch(m.home, m.away);
+                    m.homeScore = result.homeScore;
+                    m.awayScore = result.awayScore;
                     m.played = true;
                 }
             });
@@ -1848,26 +2038,17 @@
                 // User skipped playing matchday manually
                 const userMatch = getCurrentUserMatch();
                 if (userMatch && !userMatch.played) {
-                    // Simulate user team match using overall rating weights
-                    const { homePower, awayPower, homeChance } = calculateMatchProbabilities(userMatch.home, userMatch.away);
-                    let hGoals = 0;
-                    let aGoals = 0;
-                    for (let i = 0; i < 8; i++) {
-                        if (Math.random() < 0.32) {
-                            if (Math.random() < homeChance) {
-                                if (Math.random() < 0.22 * Math.pow(homePower / awayPower, 1.1)) hGoals++;
-                            } else {
-                                if (Math.random() < 0.22 * Math.pow(awayPower / homePower, 1.1)) aGoals++;
-                            }
-                        }
-                    }
-
-                    userMatch.homeScore = hGoals;
-                    userMatch.awayScore = aGoals;
+                    const result = simulateTeamMatch(userMatch.home, userMatch.away);
+                    userMatch.homeScore = result.homeScore;
+                    userMatch.awayScore = result.awayScore;
                     userMatch.played = true;
 
-                    const userGoals = Math.random() < 0.4 ? Math.floor(Math.random() * 2) + 1 : 0;
-                    const userAssists = Math.random() < 0.3 ? 1 : 0;
+                    const userTeamGoals = userMatch.home === gameState.player.club ? userMatch.homeScore : userMatch.awayScore;
+                    let userGoals = 0;
+                    for (let goal = 0; goal < userTeamGoals; goal++) {
+                        if (Math.random() < 0.45) userGoals++;
+                    }
+                    const userAssists = userTeamGoals > userGoals && Math.random() < 0.3 ? 1 : 0;
                     const rating = parseFloat((Math.random() * 2.5 + 6.0).toFixed(1));
 
                     gameState.player.xp += 20;
@@ -1896,8 +2077,8 @@
                 recalculateLeagueTable();
             }
 
-            // Check End of Season (10 Weeks Total)
-            if (currentWeek >= 10) {
+            // Check End of Season after every scheduled matchday.
+            if (currentWeek >= TOTAL_SEASON_WEEKS) {
                 showEndSeasonModal();
                 return;
             }
@@ -1917,16 +2098,22 @@
             const sorted = [...gameState.league].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
             const champion = sorted[0];
             const isUserChamp = champion.name === gameState.player.club;
+            const seasonStats = gameState.career.seasonTotals;
+            const seasonAverage = seasonStats.apps > 0 ? (seasonStats.ratingSum / seasonStats.apps).toFixed(1) : '0.0';
+            const playerPosition = sorted.findIndex(team => team.name === gameState.player.club) + 1;
+
+            document.getElementById('end-season-title').innerText = `Season ${gameState.career.season} Complete!`;
+            document.getElementById('end-season-sub').innerText = `${gameState.league.length} teams • ${gameState.schedule.length} matchdays completed`;
 
             let tableHTML = `
-                <div class="mt-3 overflow-x-auto bg-slate-900 rounded-lg border border-slate-800 p-2">
-                    <table class="w-full text-[10px] text-left">
-                        <thead class="text-slate-400 uppercase">
+                <div class="min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-slate-950/50">
+                    <table class="w-full min-w-[380px] text-[10px] text-left">
+                        <thead class="sticky top-0 bg-slate-900 text-slate-400 uppercase">
                             <tr>
-                                <th class="p-1">#</th>
-                                <th class="p-1">Club</th>
-                                <th class="p-1 text-center">GD</th>
-                                <th class="p-1 text-right">Pts</th>
+                                <th class="p-2">#</th>
+                                <th class="p-2">Club</th>
+                                <th class="p-2 text-center">GD</th>
+                                <th class="p-2 text-right">Pts</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800">
@@ -1936,44 +2123,68 @@
                 const isUser = team.name === gameState.player.club;
                 tableHTML += `
                     <tr class="${isUser ? 'text-emerald-400 font-bold' : 'text-slate-300'}">
-                        <td class="p-1">${idx + 1}</td>
-                        <td class="p-1">${team.name}</td>
-                        <td class="p-1 text-center">${team.gf - team.ga}</td>
-                        <td class="p-1 text-right font-bold">${team.pts}</td>
+                        <td class="p-2">${idx + 1}</td>
+                        <td class="p-2">${team.name}</td>
+                        <td class="p-2 text-center">${team.gf - team.ga}</td>
+                        <td class="p-2 text-right font-bold">${team.pts}</td>
                     </tr>
                 `;
             });
             tableHTML += `</tbody></table></div>`;
 
             let fixturesHTML = `
-                <div class="mt-3 bg-slate-900 rounded-lg border border-slate-800 p-2 max-h-24 overflow-y-auto pr-1">
-                    <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">Your Season Results</div>
+                <div class="min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-slate-950/50 divide-y divide-slate-800">
             `;
-            gameState.career.matchHistory.slice(-10).forEach(m => {
-                fixturesHTML += `<div class="text-[10px] text-slate-300 py-0.5 flex justify-between border-b border-slate-800 last:border-0"><span>W${m.week} vs ${m.opponent}</span><span class="font-bold text-emerald-400">${m.score}</span></div>`;
+            const seasonMatchReviews = gameState.career.matchHistory.slice(-TOTAL_SEASON_WEEKS);
+            if (seasonMatchReviews.length === 0) {
+                fixturesHTML += '<p class="p-4 text-xs text-slate-400">No player match reviews for this season.</p>';
+            }
+            seasonMatchReviews.forEach(match => {
+                fixturesHTML += `
+                    <div class="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-200">Week ${match.week} vs ${match.opponent}</div>
+                            <div class="text-[10px] text-slate-400">${match.goals} G · ${match.assists} A · Rating ${Number(match.rating || 0).toFixed(1)}</div>
+                        </div>
+                        <div class="font-mono font-bold text-emerald-400 shrink-0">${match.score}</div>
+                    </div>
+                `;
             });
             fixturesHTML += `</div>`;
 
             const card = document.getElementById('end-season-summary-card');
             if (card) {
                 card.innerHTML = `
-                    <div class="p-3 bg-indigo-950/40 border border-indigo-500/30 rounded-xl text-center">
-                        <span class="text-xs text-indigo-300 font-bold uppercase">League Champion</span>
-                        <div class="font-display text-2xl font-extrabold text-amber-400 mt-1">${champion.name} 🏆</div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3 text-xs pt-2">
-                        <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800">
-                            <span class="text-slate-400">Finish Position:</span>
-                            <div class="font-bold text-lg ${isUserChamp ? 'text-amber-400' : 'text-slate-200'}">#${sorted.findIndex(t => t.name === gameState.player.club) + 1} Place</div>
+                    <div class="flex items-center justify-between gap-4 rounded-xl border border-indigo-500/30 bg-indigo-950/40 px-4 py-3 shrink-0">
+                        <div>
+                            <div class="text-[10px] font-bold uppercase text-indigo-300">League Champion</div>
+                            <div class="font-display text-2xl font-extrabold text-amber-400">${champion.name}</div>
                         </div>
-                        <div class="p-2.5 bg-slate-900 rounded-lg border border-slate-800">
-                            <span class="text-slate-400">Season Goals:</span>
-                            <div class="font-bold text-lg text-emerald-400">${gameState.career.totals.goals} Goals</div>
-                        </div>
+                        <i class="fa-solid fa-trophy text-3xl text-amber-400" aria-hidden="true"></i>
                     </div>
-                    ${tableHTML}
-                    ${fixturesHTML}
+
+                    <section class="shrink-0 rounded-xl border border-slate-800 bg-slate-900 p-3">
+                        <h3 class="mb-2 text-xs font-bold uppercase text-slate-300">Player Season Performance</h3>
+                        <div class="grid grid-cols-3 gap-2 text-center sm:grid-cols-6">
+                            <div><div class="text-[10px] text-slate-400">Finish</div><div class="font-bold ${isUserChamp ? 'text-amber-400' : 'text-white'}">#${playerPosition}</div></div>
+                            <div><div class="text-[10px] text-slate-400">Apps</div><div class="font-bold text-white">${seasonStats.apps}</div></div>
+                            <div><div class="text-[10px] text-slate-400">Goals</div><div class="font-bold text-emerald-400">${seasonStats.goals}</div></div>
+                            <div><div class="text-[10px] text-slate-400">Assists</div><div class="font-bold text-cyan-400">${seasonStats.assists}</div></div>
+                            <div><div class="text-[10px] text-slate-400">Avg Rating</div><div class="font-bold text-white">${seasonAverage}</div></div>
+                            <div><div class="text-[10px] text-slate-400">MOTM</div><div class="font-bold text-amber-400">${seasonStats.motm}</div></div>
+                        </div>
+                    </section>
+
+                    <div class="grid grid-cols-1 gap-3 flex-1 min-h-0 overflow-y-auto md:grid-cols-2 md:overflow-hidden">
+                        <section class="flex min-h-[14rem] flex-col rounded-xl border border-slate-800 bg-slate-900 p-3 md:min-h-0">
+                            <h3 class="mb-2 shrink-0 text-xs font-bold uppercase text-slate-300">League Table</h3>
+                            ${tableHTML}
+                        </section>
+                        <section class="flex min-h-[14rem] flex-col rounded-xl border border-slate-800 bg-slate-900 p-3 md:min-h-0">
+                            <h3 class="mb-2 shrink-0 text-xs font-bold uppercase text-slate-300">Player Match Review</h3>
+                            ${fixturesHTML}
+                        </section>
+                    </div>
                 `;
             }
 
@@ -1993,12 +2204,21 @@
             gameState.career.seasonTotals = { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 };
 
             // Reset schedule & standings for new season
-            gameState.league = DEFAULT_TEAMS.map(t => ({ name: t.name, ovr: t.ovr, pts: 0, p: 0, gf: 0, ga: 0, wins: 0, draws: 0, losses: 0 }));
+            gameState.league = gameState.league.map(team => ({
+                ...team,
+                pts: 0,
+                p: 0,
+                gf: 0,
+                ga: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0
+            }));
             gameState.schedule = generateSeasonSchedule();
 
             gameState.news.push({
                 title: `Season ${gameState.career.season} Begins!`,
-                desc: "A fresh campaign kicks off with all 6 clubs battling for the title.",
+                desc: `A fresh campaign kicks off with all ${DEFAULT_TEAMS.length} clubs battling for the title.`,
                 date: `Week 1`
             });
 
@@ -2052,7 +2272,7 @@
             gameState.player.age = Math.floor(Math.random() * 4) + 16;
 
             // BUG FIX: Correctly map strings instead of saving entire objects to the name property.
-            gameState.league = DEFAULT_TEAMS.map(t => ({ name: t.name, ovr: t.ovr, pts: 0, p: 0, gf: 0, ga: 0, wins: 0, draws: 0, losses: 0 }));
+            gameState.league = createLeagueTeams();
             gameState.schedule = generateSeasonSchedule();
 
             gameState.isCreated = true;
@@ -2077,15 +2297,27 @@
                     if (!gameState.career.seasonTotals) {
                         gameState.career.seasonTotals = { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 };
                     }
-                    // Ensure teams in league data have overall rating attached
+                    // Add ratings to older saves and keep team overall equal to their average.
                     if (gameState.league) {
                         gameState.league.forEach(t => {
                             // Save file patch: fix corrupted saves where object was mapped into name directly
                             if (typeof t.name === 'object' && t.name !== null && t.name.name) {
                                 t.name = t.name.name;
                             }
-                            if (!t.ovr) t.ovr = getTeamOvr(t.name);
+                            const teamRatings = [t.offense, t.midfield, t.defense];
+                            const ratingsAreValid = teamRatings.every(rating => Number.isInteger(rating) && rating >= 70 && rating <= 100) &&
+                                Math.max(...teamRatings) - Math.min(...teamRatings) <= 15;
+                            if (!ratingsAreValid) {
+                                Object.assign(t, createTeamRatings());
+                                teamRatingsNeedSave = true;
+                            } else {
+                                const calculatedOvr = Math.round((t.offense + t.midfield + t.defense) / 3);
+                                if (t.ovr !== calculatedOvr) teamRatingsNeedSave = true;
+                                t.ovr = calculatedOvr;
+                            }
                         });
+                    } else {
+                        gameState.league = createLeagueTeams();
                     }
                 } catch(e) { console.error(e); }
             }
