@@ -375,12 +375,18 @@
                             <h3 class="font-display text-lg font-bold text-white">Season Fixtures</h3>
                             <p id="fixture-season-summary" class="text-xs text-slate-400">Double round-robin: 20 teams, 38 rounds, 380 matches</p>
                         </div>
-                        <label class="flex items-center gap-2 text-xs text-slate-400">
-                            Week:
-                            <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
-                                <option value="all">All Weeks</option>
-                            </select>
-                        </label>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <label class="flex items-center gap-2 text-xs text-slate-400">
+                                Week:
+                                <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
+                                    <option value="all">All Weeks</option>
+                                </select>
+                            </label>
+                            <button id="btn-simulate-full-season" onclick="simulateFullSeason()" class="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400">
+                                <i class="fa-solid fa-forward-fast" aria-hidden="true"></i>
+                                Simulate Full Season
+                            </button>
+                        </div>
                     </div>
                     <div id="calendar-grid" class="space-y-6">
                         <!-- Dynamic Fixtures Cards -->
@@ -2124,9 +2130,9 @@
                     { text: `The supporters deserved more from that ${score} draw; we'll work to give them a win.`, effects: { trust: -2, teamChemistry: 1, fanSupport: 4 } }
                 ],
                 loss: [
-                    { text: `We have to stick together after this loss to ${matchEngine.opponent} and put it right as a team.`, effects: { trust: -2, teamChemistry: 3, fanSupport: -2 } },
-                    { text: `I take responsibility for my display against ${matchEngine.opponent}; the team deserved better.`, effects: { trust: 4, teamChemistry: -2, fanSupport: -2 } },
-                    { text: `I'm sorry to ${gameState.player.club} supporters for the ${score} loss; they deserved more.`, effects: { trust: -2, teamChemistry: -1, fanSupport: 4 } }
+                    { text: `Some teammates lost their marks against ${matchEngine.opponent}; they need to own those mistakes.`, effects: { trust: -2, teamChemistry: -4, fanSupport: 2 } },
+                    { text: `The manager's setup left us exposed against ${matchEngine.opponent}; the tactics have to change.`, effects: { trust: -4, teamChemistry: -1, fanSupport: 3 } },
+                    { text: `I let everyone down against ${matchEngine.opponent}; I should have done more to turn it around.`, effects: { trust: 2, teamChemistry: 1, fanSupport: -4 } }
                 ]
             };
 
@@ -2187,7 +2193,7 @@
         };
 
         // --- ADVANCE WEEK CONTROLLER ---
-        window.advanceWeek = function(simUserMatch = true) {
+        window.advanceWeek = function(simUserMatch = true, suppressPostMatch = false) {
             const currentWeek = gameState.career.week;
 
             if (simUserMatch) {
@@ -2232,7 +2238,7 @@
                 simulateOtherWeekMatches(currentWeek);
                 recalculateLeagueTable();
 
-                if (userMatch && userMatch.played) {
+                if (!suppressPostMatch && userMatch && userMatch.played) {
                     const userScore = userMatch.home === gameState.player.club ? userMatch.homeScore : userMatch.awayScore;
                     const opponentScore = userMatch.home === gameState.player.club ? userMatch.awayScore : userMatch.homeScore;
                     const matchReview = gameState.career.matchHistory[gameState.career.matchHistory.length - 1];
@@ -2258,6 +2264,7 @@
 
             // Check End of Season after every scheduled matchday.
             if (currentWeek >= TOTAL_SEASON_WEEKS) {
+                saveGame();
                 showEndSeasonModal();
                 return;
             }
@@ -2269,6 +2276,30 @@
             renderPressScenario();
             updateAllUI();
             saveGame();
+        };
+
+        window.simulateFullSeason = function() {
+            if (matchEngine.active) {
+                showMsg('Match in Progress', 'Finish or quick-sim the current match before simulating the rest of the season.');
+                return;
+            }
+
+            const button = document.getElementById('btn-simulate-full-season');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Simulating Season...';
+            }
+
+            while (gameState.career.week <= TOTAL_SEASON_WEEKS) {
+                const weekBeforeSimulation = gameState.career.week;
+                advanceWeek(true, true);
+                if (gameState.career.week === weekBeforeSimulation) break;
+            }
+
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = '<i class="fa-solid fa-forward-fast" aria-hidden="true"></i> Simulate Full Season';
+            }
         };
 
         // --- END OF SEASON SUMMARY MODAL ---
