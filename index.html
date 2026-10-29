@@ -450,11 +450,7 @@
                         <h4 class="font-display font-bold text-sm text-slate-200 uppercase tracking-wider flex items-center gap-2">
                             <i class="fa-solid fa-user-ninja text-emerald-400"></i> Your Match Performance
                         </h4>
-                        <div class="grid grid-cols-4 gap-2 text-center">
-                            <div class="bg-slate-900 p-2 rounded border border-slate-800">
-                                <div class="text-[10px] text-slate-400">Rating</div>
-                                <div id="live-rating" class="font-bold text-emerald-400 text-lg">6.5</div>
-                            </div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
                             <div class="bg-slate-900 p-2 rounded border border-slate-800">
                                 <div class="text-[10px] text-slate-400">Goals</div>
                                 <div id="live-goals" class="font-bold text-white text-lg">0</div>
@@ -464,8 +460,8 @@
                                 <div id="live-assists" class="font-bold text-white text-lg">0</div>
                             </div>
                             <div class="bg-slate-900 p-2 rounded border border-slate-800">
-                                <div class="text-[10px] text-slate-400">Shots</div>
-                                <div id="live-shots" class="font-bold text-white text-lg">0</div>
+                                <div class="text-[10px] text-slate-400">Player Rating</div>
+                                <div id="live-rating" class="font-bold text-emerald-400 text-lg">6.5</div>
                             </div>
                         </div>
                     </div>
@@ -1007,7 +1003,7 @@
             pendingChance: null,
             decisionUsed: false,
             quickSim: false,
-            playerStats: { goals: 0, assists: 0, shots: 0, rating: 6.5 }
+            playerStats: { goals: 0, assists: 0, rating: 6.5 }
         };
 
         // --- PRESS QUESTIONS DATABASE ---
@@ -1259,6 +1255,11 @@
         // --- TAB NAVIGATION SYSTEM ---
         window.switchTab = function(tabId) {
             soundFx.playClick();
+
+            const currentTab = document.querySelector('.tab-content:not(.hidden)');
+            if (currentTab && currentTab.id === 'tab-matchday' && tabId !== 'matchday') {
+                resetMatchdayDisplay();
+            }
             
             const tabs = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => tab.classList.add('hidden'));
@@ -1285,6 +1286,21 @@
                 updateLeagueTableUI();
             }
         };
+
+        function resetMatchdayDisplay() {
+            document.getElementById('live-goals').innerText = '0';
+            document.getElementById('live-assists').innerText = '0';
+            document.getElementById('live-rating').innerText = '6.5';
+            document.getElementById('match-score-home').innerText = '0';
+            document.getElementById('match-score-away').innerText = '0';
+            document.getElementById('match-timer').innerText = '0:00';
+            document.getElementById('match-status-label').innerText = 'PRE-MATCH';
+            document.getElementById('commentary-log').innerHTML = '<div class="text-slate-500 italic">Match will begin shortly...</div>';
+        }
+
+        function isMatchdayVisible() {
+            return !document.getElementById('tab-matchday').classList.contains('hidden');
+        }
 
         window.switchLeagueInfoTab = function(tabId) {
             const isTable = tabId === 'table';
@@ -1711,7 +1727,7 @@
             matchEngine.minute = 0;
             matchEngine.homeScore = 0;
             matchEngine.awayScore = 0;
-            matchEngine.playerStats = { goals: 0, assists: 0, shots: 0, rating: 6.0 };
+            matchEngine.playerStats = { goals: 0, assists: 0, rating: 6.0 };
             const homeTeam = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
             const awayTeam = matchEngine.isHome ? matchEngine.opponent : gameState.player.club;
             matchEngine.chanceEvents = simulateTeamMatch(homeTeam, awayTeam).events;
@@ -1743,7 +1759,7 @@
                 if (matchEngine.paused) return;
                 
                 if (matchEngine.minute === 45) {
-                    const log = document.getElementById('commentary-log');
+                    const log = isMatchdayVisible() ? document.getElementById('commentary-log') : null;
                     if (log) log.innerHTML += `<div class="text-amber-400 font-bold">45' Half-time whistle!</div>`;
                 }
                 
@@ -1802,11 +1818,10 @@
         }
 
         function processMatchChance(chanceEvent, decisionType = null) {
-            const log = document.getElementById('commentary-log');
+            const matchdayVisible = isMatchdayVisible();
+            const log = matchdayVisible ? document.getElementById('commentary-log') : null;
             const isUserTeamAttack = chanceEvent.attackingTeam === gameState.player.club;
             const homeTeamName = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
-
-            if (isUserTeamAttack) matchEngine.playerStats.shots++;
 
             if (chanceEvent.isGoal) {
                 if (chanceEvent.attackingTeam === homeTeamName) {
@@ -1819,32 +1834,61 @@
                     if (decisionType === 'pass') {
                         matchEngine.playerStats.assists++;
                         matchEngine.playerStats.rating += 0.7;
-                        if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' GOAL! ${gameState.player.name} creates the chance for a teammate.</div>`;
+                        if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' What a brilliant team play by ${chanceEvent.attackingTeam} to set up an easy goal!</div>`;
                     } else if (decisionType === 'power' || decisionType === 'chip' || Math.random() < 0.45) {
                         matchEngine.playerStats.goals++;
                         matchEngine.playerStats.rating += 0.8;
-                        if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' GOAL! ${gameState.player.name} scores!</div>`;
+                        const playerGoalCommentary = [
+                            `${gameState.player.name} BANGS ONE IN OFF THE CROSSBAR!`,
+                            `${gameState.player.name} rifles the ball into the bottom corner!`,
+                            `${gameState.player.name} curls a beautiful finish into the far corner!`,
+                            `${gameState.player.name} pounces on the rebound and buries it!`,
+                            `${gameState.player.name} punches it in from the corner!`
+                        ];
+                        if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' ${playerGoalCommentary[randomInteger(0, playerGoalCommentary.length - 1)]}</div>`;
                     } else if (log) {
-                        log.innerHTML += `<div class="text-emerald-300">${matchEngine.minute}' GOAL! ${gameState.player.club} scores.</div>`;
+                        const teamGoalCommentary = [
+                            `What a brilliant team play by ${chanceEvent.attackingTeam} to set up an easy goal!`,
+                            `${chanceEvent.attackingTeam} works the ball across the box for a simple finish!`,
+                            `${chanceEvent.attackingTeam} catches the defense out with a quick passing move!`,
+                            `${chanceEvent.attackingTeam} turns the loose ball into a composed finish!`
+                        ];
+                        log.innerHTML += `<div class="text-emerald-300">${matchEngine.minute}' ${teamGoalCommentary[randomInteger(0, teamGoalCommentary.length - 1)]}</div>`;
                     }
                 } else if (log) {
-                    log.innerHTML += `<div class="text-rose-400">${matchEngine.minute}' GOAL! ${chanceEvent.attackingTeam} scores.</div>`;
+                    const teamGoalCommentary = [
+                        `${chanceEvent.attackingTeam} BANGS ONE IN OFF THE CROSSBAR!`,
+                        `What a brilliant team play by ${chanceEvent.attackingTeam} to set up an easy goal!`,
+                        `${chanceEvent.attackingTeam} powers a finish into the bottom corner!`,
+                        `${chanceEvent.attackingTeam} pounces on the rebound and scores!`,
+                        `${chanceEvent.attackingTeam} punches it in from the corner!`
+                    ];
+                    log.innerHTML += `<div class="text-rose-400">${matchEngine.minute}' ${teamGoalCommentary[randomInteger(0, teamGoalCommentary.length - 1)]}</div>`;
                 }
 
                 soundFx.playGoal();
                 document.getElementById('match-score-home').innerText = matchEngine.homeScore;
                 document.getElementById('match-score-away').innerText = matchEngine.awayScore;
             } else if (log) {
-                const missedChanceText = isUserTeamAttack
-                    ? `${gameState.player.name}'s chance is saved by the keeper.`
-                    : `${chanceEvent.attackingTeam}'s chance is saved by the keeper.`;
+                const missedChanceCommentary = [
+                    `${chanceEvent.attackingTeam} skies the shot over the bar!`,
+                    `${chanceEvent.attackingTeam} drags the shot wide!`,
+                    `${chanceEvent.attackingTeam}'s shot is denied by a brilliant save from the keeper!`,
+                    `${chanceEvent.attackingTeam}'s shot was blocked by a defender!`,
+                    `${chanceEvent.attackingTeam} completely messes up the shot and sends a dribbler straight to the keeper!`,
+                    `${chanceEvent.attackingTeam} fires just over the crossbar!`,
+                    `${chanceEvent.attackingTeam} curls the attempt narrowly wide!`,
+                    `${chanceEvent.attackingTeam} can't find the target from close range!`
+                ];
+                const missedChanceText = missedChanceCommentary[randomInteger(0, missedChanceCommentary.length - 1)];
                 log.innerHTML += `<div class="text-slate-300">${matchEngine.minute}' ${missedChanceText}</div>`;
             }
 
-            document.getElementById('live-goals').innerText = matchEngine.playerStats.goals;
-            document.getElementById('live-assists').innerText = matchEngine.playerStats.assists;
-            document.getElementById('live-shots').innerText = matchEngine.playerStats.shots;
-            document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
+            if (matchdayVisible) {
+                document.getElementById('live-goals').innerText = matchEngine.playerStats.goals;
+                document.getElementById('live-assists').innerText = matchEngine.playerStats.assists;
+                document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
+            }
             if (log) log.scrollTop = log.scrollHeight;
         }
 
@@ -1900,7 +1944,7 @@
                 simulateMatchEvent();
 
                 if (matchEngine.minute === 45) {
-                    const log = document.getElementById('commentary-log');
+                    const log = isMatchdayVisible() ? document.getElementById('commentary-log') : null;
                     if (log) log.innerHTML += `<div class="text-amber-400 font-bold">45' Half-time whistle!</div>`;
                 }
             }
