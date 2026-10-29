@@ -192,10 +192,6 @@
                     <span class="hidden md:inline">Career Stats</span>
                 </button>
 
-                <button onclick="switchTab('press')" id="nav-press" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition text-left font-medium">
-                    <i class="fa-solid fa-newspaper w-5 text-center text-lg text-rose-400"></i>
-                    <span class="hidden md:inline">Off-Pitch & Press</span>
-                </button>
             </nav>
 
             <div class="px-3 pt-4 border-t border-slate-800/80 space-y-2">
@@ -701,7 +697,32 @@
                 </div>
             </div>
 
-            <button onclick="closePostMatchModal()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition">
+            <button onclick="proceedToPostMatchInterview()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition">
+                Proceed to Post-Match Interview
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: POST-MATCH INTERVIEW -->
+    <div id="modal-post-match-interview" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-[55]">
+        <div class="bg-fm-card border border-fm-border rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+            <div class="space-y-2 border-b border-slate-800 pb-4">
+                <span class="text-xs font-bold uppercase text-cyan-400">Post-Match Interview</span>
+                <h2 class="font-display text-2xl font-extrabold text-white">The Press Room</h2>
+                <p id="post-match-interview-question" class="text-sm text-slate-300"></p>
+            </div>
+            <div id="post-match-interview-options" class="space-y-3"></div>
+            <div id="post-match-interview-result" class="hidden rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-4 space-y-2">
+                <h3 class="font-bold text-emerald-300">Interview response</h3>
+                <p id="post-match-interview-feedback" class="text-sm text-slate-200"></p>
+                <p id="post-match-interview-effects" class="text-xs text-slate-300"></p>
+                <div class="grid grid-cols-3 gap-2 pt-2 text-center">
+                    <div class="rounded-lg bg-slate-900 p-2"><div class="text-[10px] text-slate-400">Manager Trust</div><div id="interview-trust-total" class="font-bold text-cyan-300"></div></div>
+                    <div class="rounded-lg bg-slate-900 p-2"><div class="text-[10px] text-slate-400">Team Chemistry</div><div id="interview-chemistry-total" class="font-bold text-emerald-300"></div></div>
+                    <div class="rounded-lg bg-slate-900 p-2"><div class="text-[10px] text-slate-400">Fan Support</div><div id="interview-fan-support-total" class="font-bold text-amber-300"></div></div>
+                </div>
+            </div>
+            <button id="post-match-interview-continue" onclick="closePostMatchInterview()" class="hidden w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition">
                 Return to Dashboard
             </button>
         </div>
@@ -952,6 +973,8 @@
         // --- GAME STATE ---
         let gameState = {
             isCreated: false,
+            teamChemistry: 70,
+            fanSupport: 70,
             player: {
                 name: "Alex Hunter",
                 position: "ST",
@@ -1005,6 +1028,8 @@
             quickSim: false,
             playerStats: { goals: 0, assists: 0, rating: 6.5 }
         };
+        let postMatchInterviewOptions = [];
+        let postMatchInterviewAnswered = false;
 
         // --- PRESS QUESTIONS DATABASE ---
         const pressQuestions = [
@@ -2037,7 +2062,9 @@
                 rating: matchEngine.playerStats.rating.toFixed(1)
             });
 
-            document.getElementById('post-match-score').innerText = `${p.club} ${matchEngine.homeScore} - ${matchEngine.awayScore} ${matchEngine.opponent}`;
+            const userScore = matchEngine.isHome ? matchEngine.homeScore : matchEngine.awayScore;
+            const opponentScore = matchEngine.isHome ? matchEngine.awayScore : matchEngine.homeScore;
+            document.getElementById('post-match-score').innerText = `${p.club} ${userScore} - ${opponentScore} ${matchEngine.opponent}`;
             document.getElementById('post-match-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
             document.getElementById('post-match-goals').innerText = matchEngine.playerStats.goals;
             document.getElementById('post-match-assists').innerText = matchEngine.playerStats.assists;
@@ -2066,10 +2093,95 @@
             });
         }
 
-        window.closePostMatchModal = function() {
+        window.proceedToPostMatchInterview = function() {
             document.getElementById('modal-post-match').classList.add('hidden');
             document.getElementById('modal-post-match').classList.remove('flex');
-            
+
+            const userScore = matchEngine.isHome ? matchEngine.homeScore : matchEngine.awayScore;
+            const opponentScore = matchEngine.isHome ? matchEngine.awayScore : matchEngine.homeScore;
+            const result = userScore > opponentScore ? 'win' : userScore < opponentScore ? 'loss' : 'draw';
+            const score = `${userScore}-${opponentScore}`;
+            const resultDescription = result === 'win' ? 'win' : result === 'loss' ? 'loss' : 'draw';
+            const playerRating = Number(matchEngine.playerStats.rating.toFixed(1));
+            const performance = playerRating >= 8 ? 'strong' : playerRating <= 6.2 ? 'rough' : 'steady';
+
+            const interviewQuestions = {
+                strong: `Your match rating was ${playerRating} in the ${score} ${resultDescription} against ${matchEngine.opponent}. What part of your performance are you most proud of, and what would you improve?`,
+                rough: `You earned a ${playerRating} rating in the ${score} ${resultDescription} against ${matchEngine.opponent}. What do you need to change before the next match?`,
+                steady: `What did you make of your ${playerRating} performance in the ${score} ${resultDescription} against ${matchEngine.opponent}?`
+            };
+            document.getElementById('post-match-interview-question').innerText = interviewQuestions[performance];
+
+            const optionsByResult = {
+                win: [
+                    { text: `Credit the whole squad for the win over ${matchEngine.opponent}; we pressed and defended together.`, effects: { trust: 1, teamChemistry: 3, fanSupport: -2 } },
+                    { text: `I wanted to make an even bigger difference against ${matchEngine.opponent}; I'll keep pushing for more.`, effects: { trust: 3, teamChemistry: -2, fanSupport: 1 } },
+                    { text: `This win belongs to ${gameState.player.club} supporters; their backing made the difference.`, effects: { trust: -2, teamChemistry: 1, fanSupport: 4 } }
+                ],
+                draw: [
+                    { text: `We stayed united against ${matchEngine.opponent}; sharper finishing can turn this draw into a win.`, effects: { trust: 1, teamChemistry: 3, fanSupport: -2 } },
+                    { text: `I should have done more in the final third against ${matchEngine.opponent}; I'll own that.`, effects: { trust: 3, teamChemistry: -2, fanSupport: 1 } },
+                    { text: `The supporters deserved more from that ${score} draw; we'll work to give them a win.`, effects: { trust: -2, teamChemistry: 1, fanSupport: 4 } }
+                ],
+                loss: [
+                    { text: `We have to stick together after this loss to ${matchEngine.opponent} and put it right as a team.`, effects: { trust: -2, teamChemistry: 3, fanSupport: -2 } },
+                    { text: `I take responsibility for my display against ${matchEngine.opponent}; the team deserved better.`, effects: { trust: 4, teamChemistry: -2, fanSupport: -2 } },
+                    { text: `I'm sorry to ${gameState.player.club} supporters for the ${score} loss; they deserved more.`, effects: { trust: -2, teamChemistry: -1, fanSupport: 4 } }
+                ]
+            };
+
+            postMatchInterviewOptions = optionsByResult[result];
+            postMatchInterviewAnswered = false;
+            const optionsContainer = document.getElementById('post-match-interview-options');
+            optionsContainer.innerHTML = '';
+            postMatchInterviewOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full rounded-xl border border-slate-700 bg-slate-900 p-4 text-left text-sm text-slate-200 transition hover:border-emerald-500/60 hover:bg-slate-800';
+                button.textContent = option.text;
+                button.onclick = () => window.answerPostMatchInterview(index);
+                optionsContainer.appendChild(button);
+            });
+            optionsContainer.classList.remove('hidden');
+            document.getElementById('post-match-interview-result').classList.add('hidden');
+            document.getElementById('post-match-interview-continue').classList.add('hidden');
+            document.getElementById('modal-post-match-interview').classList.remove('hidden');
+            document.getElementById('modal-post-match-interview').classList.add('flex');
+        };
+
+        window.answerPostMatchInterview = function(optionIndex) {
+            if (postMatchInterviewAnswered) return;
+            const option = postMatchInterviewOptions[optionIndex];
+            if (!option) return;
+
+            postMatchInterviewAnswered = true;
+            const statNames = { trust: 'Manager Trust', teamChemistry: 'Team Chemistry', fanSupport: 'Fan Support' };
+            const effectsText = [];
+            Object.entries(option.effects).forEach(([stat, change]) => {
+                const currentValue = stat === 'trust' ? gameState.player.trust : gameState[stat];
+                const updatedValue = Math.min(100, Math.max(0, currentValue + change));
+                if (stat === 'trust') gameState.player.trust = updatedValue;
+                else gameState[stat] = updatedValue;
+                const actualChange = updatedValue - currentValue;
+                const effectClass = actualChange >= 0 ? 'text-emerald-300' : 'text-rose-300';
+                effectsText.push(`<span class="${effectClass}">${statNames[stat]} ${actualChange > 0 ? '+' : ''}${actualChange}</span>`);
+            });
+
+            updateAllUI();
+            saveGame();
+            document.getElementById('post-match-interview-feedback').innerText = `You chose: “${option.text}”`;
+            document.getElementById('post-match-interview-effects').innerHTML = `Impact: ${effectsText.join(' · ')}`;
+            document.getElementById('interview-trust-total').innerText = `${gameState.player.trust}%`;
+            document.getElementById('interview-chemistry-total').innerText = `${gameState.teamChemistry}%`;
+            document.getElementById('interview-fan-support-total').innerText = `${gameState.fanSupport}%`;
+            document.getElementById('post-match-interview-options').classList.add('hidden');
+            document.getElementById('post-match-interview-result').classList.remove('hidden');
+            document.getElementById('post-match-interview-continue').classList.remove('hidden');
+        };
+
+        window.closePostMatchInterview = function() {
+            if (!postMatchInterviewAnswered) return;
+            document.getElementById('modal-post-match-interview').classList.add('hidden');
+            document.getElementById('modal-post-match-interview').classList.remove('flex');
             advanceWeek(false);
             switchTab('dashboard');
         };
@@ -2119,6 +2231,29 @@
                 // Simulate all other matches for current week
                 simulateOtherWeekMatches(currentWeek);
                 recalculateLeagueTable();
+
+                if (userMatch && userMatch.played) {
+                    const userScore = userMatch.home === gameState.player.club ? userMatch.homeScore : userMatch.awayScore;
+                    const opponentScore = userMatch.home === gameState.player.club ? userMatch.awayScore : userMatch.homeScore;
+                    const matchReview = gameState.career.matchHistory[gameState.career.matchHistory.length - 1];
+                    matchEngine.isHome = userMatch.home === gameState.player.club;
+                    matchEngine.opponent = matchEngine.isHome ? userMatch.away : userMatch.home;
+                    matchEngine.homeScore = userMatch.homeScore;
+                    matchEngine.awayScore = userMatch.awayScore;
+                    matchEngine.playerStats = {
+                        goals: matchReview ? matchReview.goals : 0,
+                        assists: matchReview ? matchReview.assists : 0,
+                        rating: matchReview ? Number(matchReview.rating) : 6.0
+                    };
+                    document.getElementById('post-match-score').innerText = `${gameState.player.club} ${userScore} - ${opponentScore} ${matchEngine.opponent}`;
+                    document.getElementById('post-match-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
+                    document.getElementById('post-match-goals').innerText = matchEngine.playerStats.goals;
+                    document.getElementById('post-match-assists').innerText = matchEngine.playerStats.assists;
+                    document.getElementById('post-match-xp').innerText = '+20 XP';
+                    document.getElementById('modal-post-match').classList.remove('hidden');
+                    document.getElementById('modal-post-match').classList.add('flex');
+                    return;
+                }
             }
 
             // Check End of Season after every scheduled matchday.
@@ -2338,6 +2473,8 @@
                     if (gameState.isCreated === undefined) {
                         gameState.isCreated = true;
                     }
+                    if (!Number.isFinite(gameState.teamChemistry)) gameState.teamChemistry = 70;
+                    if (!Number.isFinite(gameState.fanSupport)) gameState.fanSupport = 70;
                     if (!gameState.career.seasonTotals) {
                         gameState.career.seasonTotals = { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 };
                     }
