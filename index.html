@@ -42,6 +42,11 @@
             }
         }
     </script>
+    <script>
+        const savedTheme = localStorage.getItem('soccer_career_theme');
+        document.documentElement.dataset.theme = savedTheme === 'light' ? 'light' : 'dark';
+        document.documentElement.classList.toggle('dark', document.documentElement.dataset.theme === 'dark');
+    </script>
 
     <style>
         ::-webkit-scrollbar {
@@ -65,6 +70,81 @@
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(51, 65, 85, 0.6);
+        }
+
+        html[data-theme="light"] body,
+        html[data-theme="light"] .bg-fm-bg {
+            background-color: #edf2f5 !important;
+            color: #1e293b !important;
+        }
+        html[data-theme="light"] [class*="bg-fm-card"] {
+            background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1)) !important;
+        }
+        html[data-theme="light"] .bg-fm-panel {
+            background-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] [class*="bg-slate-950"] {
+            background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1)) !important;
+        }
+        html[data-theme="light"] [class*="bg-slate-900"] {
+            background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1)) !important;
+        }
+        html[data-theme="light"] [class*="bg-slate-800"] {
+            background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1)) !important;
+        }
+        html[data-theme="light"] [class*="bg-slate-700"] {
+            background-color: rgb(203 213 225 / var(--tw-bg-opacity, 1)) !important;
+        }
+        html[data-theme="light"] [class*="bg-emerald-950"] {
+            background-color: rgb(16 185 129 / 0.12) !important;
+        }
+        html[data-theme="light"] [class*="bg-indigo-950"] {
+            background-color: rgb(99 102 241 / 0.1) !important;
+        }
+        html[data-theme="light"] [class*="bg-rose-950"] {
+            background-color: rgb(244 63 94 / 0.1) !important;
+        }
+        html[data-theme="light"] .from-slate-900 {
+            --tw-gradient-from: #e2e8f0 var(--tw-gradient-from-position) !important;
+            --tw-gradient-to: rgb(226 232 240 / 0) var(--tw-gradient-to-position) !important;
+        }
+        html[data-theme="light"] .via-slate-800 {
+            --tw-gradient-to: rgb(241 245 249 / 0) var(--tw-gradient-to-position) !important;
+            --tw-gradient-stops: var(--tw-gradient-from), #f1f5f9 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+        }
+        html[data-theme="light"] .to-emerald-950 {
+            --tw-gradient-to: #d1fae5 var(--tw-gradient-to-position) !important;
+        }
+        html[data-theme="light"] .text-white,
+        html[data-theme="light"] .text-slate-100 {
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .text-slate-200 {
+            color: #1e293b !important;
+        }
+        html[data-theme="light"] .text-slate-300 {
+            color: #334155 !important;
+        }
+        html[data-theme="light"] .text-slate-400 {
+            color: #475569 !important;
+        }
+        html[data-theme="light"] .text-slate-500 {
+            color: #64748b !important;
+        }
+        html[data-theme="light"] [class*="border-fm-border"],
+        html[data-theme="light"] [class*="border-slate-800"],
+        html[data-theme="light"] [class*="border-slate-700"],
+        html[data-theme="light"] [class*="border-slate-600"] {
+            border-color: #cbd5e1 !important;
+        }
+        html[data-theme="light"] .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
+            border-color: #e2e8f0 !important;
+        }
+        html[data-theme="light"] ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        html[data-theme="light"] ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
         }
     </style>
 </head>
@@ -199,6 +279,10 @@
                     <span class="hidden md:inline">SFX Audio</span>
                     <i id="sound-icon" class="fa-solid fa-volume-high text-emerald-400"></i>
                 </button>
+                <button id="btn-theme-toggle" onclick="toggleTheme()" class="w-full flex items-center justify-between px-3 py-2 text-xs text-slate-400 hover:text-slate-200 bg-slate-900 rounded-lg border border-slate-800" aria-label="Switch to light mode" title="Switch to light mode">
+                    <span id="theme-toggle-label" class="hidden md:inline">Light Mode</span>
+                    <i id="theme-toggle-icon" class="fa-solid fa-sun text-amber-400" aria-hidden="true"></i>
+                </button>
                 <div class="hidden md:block text-[11px] text-slate-500 text-center font-mono">FM Engine v2.6.1</div>
             </div>
         </aside>
@@ -214,13 +298,17 @@
                         <div class="absolute -right-10 -bottom-10 opacity-10 text-emerald-400 text-9xl">
                             <i class="fa-solid fa-futbol"></i>
                         </div>
-                        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="relative z-10 flex flex-col md:flex-row md:flex-wrap xl:flex-nowrap items-center justify-between gap-6">
                             <div class="space-y-2 text-center md:text-left">
                                 <span class="bg-emerald-500/20 text-emerald-400 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider">Upcoming Fixture</span>
                                 <h2 id="dash-next-match-title" class="font-display text-2xl md:text-3xl font-bold text-white">London Blues vs Manchester Blue</h2>
                                 <p id="dash-next-match-sub" class="text-slate-300 text-sm">Premier League • Week 1</p>
                             </div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex flex-wrap items-center justify-center gap-2 xl:justify-end">
+                                <button id="btn-simulate-full-season" onclick="simulateFullSeason()" class="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-950/60 px-4 py-3 text-sm font-bold text-emerald-300 transition hover:bg-emerald-900/70">
+                                    <i class="fa-solid fa-forward-fast" aria-hidden="true"></i>
+                                    Simulate Full Season
+                                </button>
                                 <button onclick="advanceWeek(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-3 rounded-xl border border-slate-700 font-semibold text-sm transition flex items-center gap-2">
                                     <i class="fa-solid fa-forward"></i> Rest / Skip Week
                                 </button>
@@ -316,15 +404,24 @@
                         </div>
                     </div>
 
-                    <!-- Club News Feed -->
-                    <div class="bg-fm-card border border-fm-border rounded-xl p-5 space-y-3">
+                    <!-- Training Shortcut -->
+                    <div class="bg-fm-card border border-fm-border rounded-xl p-5 space-y-4">
                         <h3 class="font-display text-lg font-bold text-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-inbox text-cyan-400"></i>
-                            Club News & Messages
+                            <i class="fa-solid fa-dumbbell text-amber-400"></i>
+                            Training Center
                         </h3>
-                        <div id="dash-news-feed" class="space-y-3 max-h-[220px] overflow-y-auto pr-1">
-                            <!-- Dynamic -->
+                        <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-3">
+                            <span class="text-xs text-slate-400">Player OVR</span>
+                            <span id="dash-training-ovr" class="font-display text-xl font-bold text-emerald-400">61</span>
                         </div>
+                        <div class="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 p-3">
+                            <span class="text-xs text-slate-400">Available XP</span>
+                            <span id="dash-training-xp" class="font-display text-lg font-bold text-emerald-400">150 XP</span>
+                        </div>
+                        <button onclick="switchTab('training')" class="w-full flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-400">
+                            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                            Train Attributes
+                        </button>
                     </div>
                 </div>
             </section>
@@ -375,18 +472,12 @@
                             <h3 class="font-display text-lg font-bold text-white">Season Fixtures</h3>
                             <p id="fixture-season-summary" class="text-xs text-slate-400">Double round-robin: 20 teams, 38 rounds, 380 matches</p>
                         </div>
-                        <div class="flex flex-wrap items-center gap-3">
-                            <label class="flex items-center gap-2 text-xs text-slate-400">
-                                Week:
-                                <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
-                                    <option value="all">All Weeks</option>
-                                </select>
-                            </label>
-                            <button id="btn-simulate-full-season" onclick="simulateFullSeason()" class="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 transition hover:bg-emerald-400">
-                                <i class="fa-solid fa-forward-fast" aria-hidden="true"></i>
-                                Simulate Full Season
-                            </button>
-                        </div>
+                        <label class="flex items-center gap-2 text-xs text-slate-400">
+                            Week:
+                            <select id="calendar-week-filter" onchange="renderCalendarUI()" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-1.5 text-white">
+                                <option value="all">All Weeks</option>
+                            </select>
+                        </label>
                     </div>
                     <div id="calendar-grid" class="space-y-6">
                         <!-- Dynamic Fixtures Cards -->
@@ -580,23 +671,25 @@
 
                 <div class="bg-fm-card border border-fm-border rounded-2xl p-6 space-y-4">
                     <h3 class="font-display text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Season Match Log
+                        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Season-by-Season Summary
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs text-left">
                             <thead class="text-[10px] text-slate-400 uppercase bg-slate-900/80">
                                 <tr>
-                                    <th class="p-3">Week</th>
-                                    <th class="p-3">Opponent</th>
-                                    <th class="p-3 text-center">Score</th>
-                                    <th class="p-3 text-center">G</th>
-                                    <th class="p-3 text-center">A</th>
-                                    <th class="p-3 text-center">Rating</th>
+                                    <th class="p-3">Season</th>
+                                    <th class="p-3">Team</th>
+                                    <th class="p-3 text-center">Finish</th>
+                                    <th class="p-3 text-center">OVR</th>
+                                    <th class="p-3 text-center">Apps</th>
+                                    <th class="p-3 text-center">Goals</th>
+                                    <th class="p-3 text-center">Assists</th>
+                                    <th class="p-3 text-center">Average Rating</th>
                                 </tr>
                             </thead>
                             <tbody id="career-history-tbody" class="divide-y divide-slate-800 font-medium">
                                 <tr>
-                                    <td colspan="6" class="p-4 text-center text-slate-500 italic">No matches played yet.</td>
+                                    <td colspan="8" class="p-4 text-center text-slate-500 italic">No season stats yet.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -643,11 +736,11 @@
 
     <!-- MODAL: MID-GAME DECISION -->
     <div id="modal-decision" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-        <div class="bg-fm-card border-2 border-emerald-500/80 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl pulse-glow">
+        <div class="bg-fm-card border-2 border-emerald-500/80 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl pulse-glow text-center">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2 text-emerald-400 font-display font-bold text-lg">
                     <i class="fa-solid fa-bolt text-xl animate-bounce"></i>
-                    <span>KEY MATCH MOMENT!</span>
+                    <span>SETTLE THE BALL</span>
                 </div>
                 <div id="decision-minute" class="font-mono bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
                     67'
@@ -655,15 +748,40 @@
             </div>
 
             <div class="space-y-2">
-                <h3 id="decision-title" class="font-display text-2xl font-extrabold text-white">1v1 Counter Attack</h3>
-                <p id="decision-desc" class="text-sm text-slate-300 leading-relaxed">
-                    You break through the offside trap with the ball on your right foot!
-                </p>
+                <h3 id="decision-title" class="font-display text-2xl font-extrabold text-white">First Touch</h3>
+                <p id="decision-desc" class="text-sm text-slate-300 leading-relaxed"></p>
             </div>
 
-            <div id="decision-options" class="space-y-3 pt-2">
+            <div id="decision-sequence" class="flex min-h-16 items-center justify-center gap-3" aria-label="Arrow key sequence"></div>
+
+            <div id="decision-timer" class="space-y-2">
+                <div id="decision-timer-label" class="font-mono text-lg font-bold text-amber-300">2.0s</div>
+                <div class="h-2 overflow-hidden rounded-full bg-slate-800">
+                    <div id="decision-timer-bar" class="h-full rounded-full bg-amber-400 transition-[width] duration-75" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div id="decision-feedback" class="hidden rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm font-bold text-slate-200"></div>
+
+            <div id="decision-options" class="flex flex-wrap justify-center gap-3 pt-2">
                 <!-- Dynamic Options -->
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: GOAL CELEBRATION -->
+    <div id="modal-goal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-4 z-[65]">
+        <div class="bg-fm-card border-2 border-amber-400/70 rounded-2xl max-w-lg w-full p-7 space-y-5 shadow-2xl text-center">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-400/40 bg-amber-400/10">
+                <i class="fa-solid fa-futbol text-3xl text-amber-300" aria-hidden="true"></i>
+            </div>
+            <h2 class="font-display text-4xl font-extrabold text-amber-300">GOLAZOOOO!!!!!!!</h2>
+            <p id="goal-popup-commentary" class="text-base font-bold text-white"></p>
+            <div id="goal-popup-score" class="font-mono text-lg text-slate-300"></div>
+            <div id="goal-popup-rating" class="font-bold text-emerald-300"></div>
+            <button onclick="continueAfterGoal()" class="w-full rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-400">
+                Continue Match
+            </button>
         </div>
     </div>
 
@@ -914,6 +1032,27 @@
             }
         }
 
+        function updateThemeToggle() {
+            const isDark = document.documentElement.dataset.theme !== 'light';
+            const label = document.getElementById('theme-toggle-label');
+            const icon = document.getElementById('theme-toggle-icon');
+            const button = document.getElementById('btn-theme-toggle');
+            if (!label || !icon || !button) return;
+
+            label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+            icon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-500';
+            button.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} mode`);
+            button.title = `Switch to ${isDark ? 'light' : 'dark'} mode`;
+        }
+
+        window.toggleTheme = function() {
+            const nextTheme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.dataset.theme = nextTheme;
+            document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+            localStorage.setItem('soccer_career_theme', nextTheme);
+            updateThemeToggle();
+        };
+
         // --- LEAGUE TEAMS ---
         const DEFAULT_TEAMS = [
             { name: "Manchester Blue" },
@@ -943,12 +1082,12 @@
         let teamRatingsNeedSave = false;
 
         function createTeamRatings() {
-            const offense = Math.floor(Math.random() * 31) + 70;
-            const minMidfield = Math.max(70, offense - 15);
-            const maxMidfield = Math.min(100, offense + 15);
+            const offense = Math.floor(Math.random() * 41) + 60;
+            const minMidfield = Math.max(60, offense - 20);
+            const maxMidfield = Math.min(100, offense + 20);
             const midfield = Math.floor(Math.random() * (maxMidfield - minMidfield + 1)) + minMidfield;
-            const minDefense = Math.max(70, offense - 15, midfield - 15);
-            const maxDefense = Math.min(100, offense + 15, midfield + 15);
+            const minDefense = Math.max(60, offense - 20, midfield - 20);
+            const maxDefense = Math.min(100, offense + 20, midfield + 20);
             const defense = Math.floor(Math.random() * (maxDefense - minDefense + 1)) + minDefense;
             return { offense, midfield, defense, ovr: Math.round((offense + midfield + defense) / 3) };
         }
@@ -993,12 +1132,13 @@
                 wage: 25000,
                 value: 14500000,
                 xp: 150,
-                attributes: { pace: 78, shooting: 76, passing: 70, dribbling: 74, tackling: 45, stamina: 80, vision: 72, composure: 75 }
+                attributes: { pace: 64, shooting: 62, passing: 60, dribbling: 63, tackling: 52, stamina: 64, vision: 59, composure: 64 }
             },
             career: {
                 season: 1,
                 week: 1,
                 pressAnswered: false,
+                seasonHistory: [],
                 seasonTotals: { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 },
                 totals: { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0, trophies: 0 },
                 matchHistory: []
@@ -1034,6 +1174,9 @@
             quickSim: false,
             playerStats: { goals: 0, assists: 0, rating: 6.5 }
         };
+        let activeMinigameStage = null;
+        let minigameTimerId = null;
+        let minigameTransitionId = null;
         let postMatchInterviewOptions = [];
         let postMatchInterviewAnswered = false;
 
@@ -1102,6 +1245,7 @@
         // --- INITIALIZATION ---
         window.onload = function() {
             loadSavedGame();
+            updateThemeToggle();
 
             const hasCurrentTeams = Array.isArray(gameState.league) && gameState.league.length === DEFAULT_TEAMS.length &&
                 DEFAULT_TEAMS.every(team => gameState.league.some(leagueTeam => leagueTeam.name === team.name));
@@ -1434,6 +1578,7 @@
             document.getElementById('dash-league-title').innerText = `League Standings (${gameState.league.length} Teams)`;
             document.getElementById('dash-matchday-count').innerText = `${gameState.schedule.length} Matchdays`;
             document.getElementById('fixture-season-summary').innerText = `Double round-robin: ${DEFAULT_TEAMS.length} teams, ${TOTAL_SEASON_WEEKS} rounds, ${TOTAL_SEASON_MATCHES} matches`;
+            document.getElementById('dash-training-xp').innerText = `${p.xp} XP`;
 
             document.getElementById('metric-morale').innerText = `${p.morale}%`;
             document.getElementById('metric-energy').innerText = `${p.energy}%`;
@@ -1444,6 +1589,7 @@
             // Dashboard
             const ovr = getOverallRating();
             document.getElementById('dash-ovr').innerText = ovr;
+            document.getElementById('dash-training-ovr').innerText = ovr;
             document.getElementById('dash-age').innerText = p.age;
             document.getElementById('dash-morale').innerText = `${p.morale}%`;
             document.getElementById('dash-value').innerText = `€${(p.value / 1000000).toFixed(1)}M`;
@@ -1485,7 +1631,7 @@
 
             updateLeagueTableUI();
             updateNewsFeedUI();
-            updateMatchHistoryUI();
+            updateCareerSeasonHistoryUI();
             updateTransfersUI();
         }
 
@@ -1559,25 +1705,43 @@
             });
         }
 
-        function updateMatchHistoryUI() {
+        function updateCareerSeasonHistoryUI() {
             const tbody = document.getElementById('career-history-tbody');
             if (!tbody) return;
             tbody.innerHTML = '';
-            
-            if (gameState.career.matchHistory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500 italic">No matches played yet.</td></tr>';
+
+            const seasonRows = [...(gameState.career.seasonHistory || [])];
+            if (!seasonRows.some(season => season.season === gameState.career.season)) {
+                const currentStandings = [...gameState.league].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+                const currentPosition = currentStandings.findIndex(team => team.name === gameState.player.club) + 1;
+                const currentTeam = currentStandings[currentPosition - 1];
+                seasonRows.push({
+                    season: gameState.career.season,
+                    team: gameState.player.club,
+                    position: currentPosition,
+                    ovr: currentTeam ? currentTeam.ovr : getTeamOvr(gameState.player.club),
+                    ...gameState.career.seasonTotals
+                });
+            }
+            seasonRows.sort((a, b) => b.season - a.season);
+
+            if (seasonRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500 italic">No season stats yet.</td></tr>';
                 return;
             }
-            
-            [...gameState.career.matchHistory].reverse().forEach(m => {
+
+            seasonRows.forEach(season => {
+                const averageRating = season.apps > 0 ? (season.ratingSum / season.apps).toFixed(1) : '0.0';
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/40">
-                        <td class="p-3">W${m.week}</td>
-                        <td class="p-3">${m.opponent}</td>
-                        <td class="p-3 text-center font-bold">${m.score}</td>
-                        <td class="p-3 text-center text-emerald-400">${m.goals}</td>
-                        <td class="p-3 text-center text-cyan-400">${m.assists}</td>
-                        <td class="p-3 text-center text-amber-400">${m.rating}</td>
+                        <td class="p-3">Season ${season.season}${season.season === gameState.career.season ? ' <span class="text-emerald-400">(Current)</span>' : ''}</td>
+                        <td class="p-3">${season.team || '—'}</td>
+                        <td class="p-3 text-center">${season.season === gameState.career.season ? `#${season.position} <span class="text-emerald-400">(Current)</span>` : season.position ? `#${season.position}` : '—'}</td>
+                        <td class="p-3 text-center text-emerald-400">${Number.isFinite(season.ovr) ? season.ovr : '—'}</td>
+                        <td class="p-3 text-center">${season.apps}</td>
+                        <td class="p-3 text-center text-emerald-400">${season.goals}</td>
+                        <td class="p-3 text-center text-cyan-400">${season.assists}</td>
+                        <td class="p-3 text-center text-amber-400">${averageRating}</td>
                     </tr>
                 `;
             });
@@ -1648,7 +1812,16 @@
                     }]
                 },
                 options: { 
-                    scales: { r: { min: 0, max: 100, ticks: { display: false } } }, 
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false, stepSize: 20 },
+                            grid: { color: 'rgba(148, 163, 184, 0.55)', lineWidth: 1, circular: false },
+                            angleLines: { color: 'rgba(148, 163, 184, 0.55)', lineWidth: 1 },
+                            pointLabels: { color: '#cbd5e1' }
+                        }
+                    },
                     plugins: { legend: { display: false } } 
                 }
             });
@@ -1762,9 +1935,12 @@
             const homeTeam = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
             const awayTeam = matchEngine.isHome ? matchEngine.opponent : gameState.player.club;
             matchEngine.chanceEvents = simulateTeamMatch(homeTeam, awayTeam).events;
+            markMinigameChances(matchEngine.chanceEvents, gameState.player.club);
             matchEngine.chanceEventIndex = 0;
             matchEngine.pendingChance = null;
             matchEngine.decisionUsed = false;
+            activeMinigameStage = null;
+            clearMinigameTimers();
             
             document.getElementById('match-status-label').innerText = "LIVE";
             document.getElementById('match-score-home').innerText = 0;
@@ -1848,11 +2024,21 @@
             };
         }
 
+        function markMinigameChances(events, userTeamName) {
+            const userChances = events.filter(event => event.attackingTeam === userTeamName);
+            const selectedCount = Math.min(userChances.length, randomInteger(1, 2));
+            for (let count = 0; count < selectedCount; count++) {
+                const selectedIndex = randomInteger(0, userChances.length - 1);
+                userChances.splice(selectedIndex, 1)[0].requiresMinigame = true;
+            }
+        }
+
         function processMatchChance(chanceEvent, decisionType = null) {
             const matchdayVisible = isMatchdayVisible();
             const log = matchdayVisible ? document.getElementById('commentary-log') : null;
             const isUserTeamAttack = chanceEvent.attackingTeam === gameState.player.club;
             const homeTeamName = matchEngine.isHome ? gameState.player.club : matchEngine.opponent;
+            const previousRating = matchEngine.playerStats.rating;
 
             if (chanceEvent.isGoal) {
                 if (chanceEvent.attackingTeam === homeTeamName) {
@@ -1862,10 +2048,14 @@
                 }
 
                 if (isUserTeamAttack) {
-                    if (decisionType === 'pass') {
+                    if (decisionType === 'pass-goal') {
                         matchEngine.playerStats.assists++;
-                        matchEngine.playerStats.rating += 0.7;
-                        if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' What a brilliant team play by ${chanceEvent.attackingTeam} to set up an easy goal!</div>`;
+                        matchEngine.playerStats.rating += 1.0;
+                        if (log) log.innerHTML += `<div class="text-cyan-400 font-bold">${matchEngine.minute}' AMAZING BALL to set up a wonderful goal!</div>`;
+                    } else if (decisionType === 'shoot-goal') {
+                        matchEngine.playerStats.goals++;
+                        matchEngine.playerStats.rating += 2.0;
+                        if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' What a GOAL by ${gameState.player.name}. Absolute Genius!</div>`;
                     } else if (decisionType === 'power' || decisionType === 'chip' || Math.random() < 0.45) {
                         matchEngine.playerStats.goals++;
                         matchEngine.playerStats.rating += 0.8;
@@ -1874,7 +2064,7 @@
                             `${gameState.player.name} rifles the ball into the bottom corner!`,
                             `${gameState.player.name} curls a beautiful finish into the far corner!`,
                             `${gameState.player.name} pounces on the rebound and buries it!`,
-                            `${gameState.player.name} punches it in from the corner!`
+                            `${gameState.player.name} punches in a header from the corner!`
                         ];
                         if (log) log.innerHTML += `<div class="text-emerald-400 font-bold">${matchEngine.minute}' ${playerGoalCommentary[randomInteger(0, playerGoalCommentary.length - 1)]}</div>`;
                     } else if (log) {
@@ -1892,7 +2082,7 @@
                         `What a brilliant team play by ${chanceEvent.attackingTeam} to set up an easy goal!`,
                         `${chanceEvent.attackingTeam} powers a finish into the bottom corner!`,
                         `${chanceEvent.attackingTeam} pounces on the rebound and scores!`,
-                        `${chanceEvent.attackingTeam} punches it in from the corner!`
+                        `${chanceEvent.attackingTeam} punches in a header from the corner!`
                     ];
                     log.innerHTML += `<div class="text-rose-400">${matchEngine.minute}' ${teamGoalCommentary[randomInteger(0, teamGoalCommentary.length - 1)]}</div>`;
                 }
@@ -1900,6 +2090,16 @@
                 soundFx.playGoal();
                 document.getElementById('match-score-home').innerText = matchEngine.homeScore;
                 document.getElementById('match-score-away').innerText = matchEngine.awayScore;
+            } else if (decisionType === 'pass-miss' && log) {
+                const teammateMisses = [
+                    'drags the shot wide',
+                    'hits it over the bar',
+                    'has his shot saved by the keeper'
+                ];
+                log.innerHTML += `<div class="text-cyan-300">${matchEngine.minute}' Brilliant creativity but your teammate ${teammateMisses[randomInteger(0, teammateMisses.length - 1)]}.</div>`;
+            } else if (decisionType === 'shoot-miss') {
+                matchEngine.playerStats.rating += 1.0;
+                if (log) log.innerHTML += `<div class="text-amber-300 font-bold">${matchEngine.minute}' BRILLIANT EFFORT BY ${gameState.player.name.toUpperCase()} DENIED BY THE KEEPER!</div>`;
             } else if (log) {
                 const missedChanceCommentary = [
                     `${chanceEvent.attackingTeam} skies the shot over the bar!`,
@@ -1921,6 +2121,12 @@
                 document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
             }
             if (log) log.scrollTop = log.scrollHeight;
+            if (chanceEvent.isGoal && matchdayVisible && !matchEngine.quickSim) {
+                const goalCommentary = log && log.lastElementChild
+                    ? log.lastElementChild.innerText.replace(/^\d+'\s*/, '')
+                    : `${chanceEvent.attackingTeam} scores!`;
+                showMatchGoalPopup(goalCommentary, formatPlayerRatingChange(previousRating));
+            }
         }
 
         function simulateMatchEvent() {
@@ -1928,8 +2134,7 @@
                 matchEngine.chanceEvents[matchEngine.chanceEventIndex].minute === matchEngine.minute) {
                 const chanceEvent = matchEngine.chanceEvents[matchEngine.chanceEventIndex++];
                 const isUserChance = chanceEvent.attackingTeam === gameState.player.club;
-                if (isUserChance && !matchEngine.quickSim && !matchEngine.decisionUsed && Math.random() < 0.25) {
-                    matchEngine.decisionUsed = true;
+                if (isUserChance && chanceEvent.requiresMinigame && !matchEngine.quickSim) {
                     matchEngine.pendingChance = chanceEvent;
                     triggerDecisionModal();
                     return;
@@ -1962,6 +2167,9 @@
             if (!matchEngine.active) startMatchSimulation();
 
             clearTimeout(matchEngine.timerId);
+            clearMinigameTimers();
+            activeMinigameStage = null;
+            matchEngine.pendingChance = null;
             matchEngine.paused = false;
             matchEngine.quickSim = true;
 
@@ -1987,35 +2195,327 @@
         function triggerDecisionModal() {
             matchEngine.paused = true;
             document.getElementById('decision-minute').innerText = `${matchEngine.minute}'`;
-
-            const optionsDiv = document.getElementById('decision-options');
-            optionsDiv.innerHTML = `
-                <button onclick="resolveDecision('power')" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-left text-xs font-bold text-white transition">
-                    🎯 Power Shot Low Corner (Shooting)
-                </button>
-                <button onclick="resolveDecision('chip')" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-left text-xs font-bold text-white transition">
-                    ⚡ Chip the Goalkeeper (Dribbling)
-                </button>
-                <button onclick="resolveDecision('pass')" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-left text-xs font-bold text-white transition">
-                    🧠 Unselfish Square Pass (Vision)
-                </button>
-            `;
-
             document.getElementById('modal-decision').classList.remove('hidden');
             document.getElementById('modal-decision').classList.add('flex');
+            const clubName = gameState.player.club;
+            const clubPossessive = clubName.endsWith('s') ? `${clubName}'` : `${clubName}'s`;
+            activeMinigameStage = { type: 'intro' };
+            setMinigameScreen('A Chance to Attack', `The ball is cleared by ${clubPossessive} defense. Use the arrow keys to complete the sequence and successfully settle the ball.`);
+            document.getElementById('decision-sequence').innerHTML = '';
+            document.getElementById('decision-timer').classList.add('hidden');
+            document.getElementById('decision-feedback').classList.add('hidden');
+            document.getElementById('decision-options').innerHTML = `
+                <button onclick="enterMinigame()" class="flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-400">
+                    <i class="fa-solid fa-play" aria-hidden="true"></i> Enter Minigame
+                </button>
+            `;
         }
 
-        window.resolveDecision = function(type) {
-            document.getElementById('modal-decision').classList.add('hidden');
-            document.getElementById('modal-decision').classList.remove('flex');
-            if (matchEngine.pendingChance) {
-                processMatchChance(matchEngine.pendingChance, type);
-                matchEngine.pendingChance = null;
+        window.enterMinigame = function() {
+            if (!activeMinigameStage || activeMinigameStage.type !== 'intro') return;
+            startMinigameSequence(1, 'Use the arrow keys to complete the sequence before time runs out.');
+        }
+
+        const minigameArrows = [
+            { key: 'ArrowUp', icon: 'fa-arrow-up', label: 'Up' },
+            { key: 'ArrowDown', icon: 'fa-arrow-down', label: 'Down' },
+            { key: 'ArrowLeft', icon: 'fa-arrow-left', label: 'Left' },
+            { key: 'ArrowRight', icon: 'fa-arrow-right', label: 'Right' }
+        ];
+        const minigameDribbleMoves = ['step-over', 'roulette', 'elastico', 'rainbow flick'];
+
+        function clearMinigameTimers() {
+            if (minigameTimerId !== null) {
+                clearInterval(minigameTimerId);
+                minigameTimerId = null;
+            }
+            if (minigameTransitionId !== null) {
+                clearTimeout(minigameTransitionId);
+                minigameTransitionId = null;
+            }
+        }
+
+        function setMinigameScreen(title, description) {
+            document.getElementById('decision-title').innerText = title;
+            document.getElementById('decision-desc').innerText = description;
+        }
+
+        function renderMinigameSequence(sequence) {
+            document.getElementById('decision-sequence').innerHTML = sequence.map((key, index) => {
+                const arrow = minigameArrows.find(item => item.key === key);
+                return `<span data-sequence-index="${index}" aria-label="${arrow.label}" class="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-600 bg-slate-900 text-2xl text-white"><i class="fa-solid ${arrow.icon}" aria-hidden="true"></i></span>`;
+            }).join('');
+        }
+
+        function startMinigameSequence(stage, description) {
+            clearMinigameTimers();
+            const sequenceLength = stage + 1;
+            const duration = 2000;
+            const sequence = Array.from({ length: sequenceLength }, () => minigameArrows[randomInteger(0, minigameArrows.length - 1)].key);
+            activeMinigameStage = { type: 'sequence', stage, sequence, inputIndex: 0, duration, startedAt: performance.now() };
+
+            setMinigameScreen(`Sequence ${stage} of 3`, description);
+            renderMinigameSequence(sequence);
+            document.getElementById('decision-feedback').classList.add('hidden');
+            document.getElementById('decision-options').className = 'flex flex-wrap justify-center gap-3 pt-2';
+            document.getElementById('decision-options').innerHTML = '';
+            document.getElementById('decision-timer').classList.remove('hidden');
+            document.getElementById('decision-timer-label').innerText = `${(duration / 1000).toFixed(1)}s`;
+            document.getElementById('decision-timer-bar').style.width = '100%';
+
+            minigameTimerId = setInterval(() => {
+                if (!activeMinigameStage || activeMinigameStage.type !== 'sequence') return;
+                const remaining = Math.max(0, duration - (performance.now() - activeMinigameStage.startedAt));
+                document.getElementById('decision-timer-label').innerText = `${(remaining / 1000).toFixed(1)}s`;
+                document.getElementById('decision-timer-bar').style.width = `${(remaining / duration) * 100}%`;
+                if (remaining <= 0) failMinigameSequence(stage);
+            }, 25);
+        }
+
+        function advanceMinigameAfterSequence(stage) {
+            clearMinigameTimers();
+            activeMinigameStage = { type: 'transition', stage };
+            document.getElementById('decision-timer-label').innerText = 'Complete';
+            document.getElementById('decision-timer-bar').style.width = '0%';
+
+            if (stage === 1) {
+                setMinigameScreen('Great touch!', 'Great touch! Now avoid a slide tackle from the defense.');
+                minigameTransitionId = setTimeout(() => startMinigameSequence(2, 'Use the arrow keys to avoid the incoming slide tackle.'), 700);
+            } else if (stage === 2) {
+                const move = minigameDribbleMoves[randomInteger(0, minigameDribbleMoves.length - 1)];
+                setMinigameScreen('Beat the Defense', `What a ${move}! Play a one two with your teammate to open up space in the channels.`);
+                minigameTransitionId = setTimeout(() => startMinigameSequence(3, 'Use the arrow keys to complete the one-two and create space.'), 700);
+            } else {
+                activeMinigameStage = { type: 'choice' };
+                document.getElementById('decision-sequence').innerHTML = '';
+                document.getElementById('decision-timer').classList.add('hidden');
+                document.getElementById('decision-feedback').classList.add('hidden');
+                setMinigameScreen('Great teamwork!', 'Great teamwork! Decide to pass the ball or shoot it!');
+                document.getElementById('decision-options').innerHTML = `
+                    <button onclick="resolveDecision('pass')" class="flex min-w-40 items-center justify-center gap-3 rounded-xl border border-cyan-500/50 bg-slate-900 px-5 py-4 text-left text-sm font-bold text-white transition hover:bg-slate-800">
+                        <i class="fa-solid fa-arrow-left text-xl text-cyan-300" aria-hidden="true"></i> Pass
+                    </button>
+                    <button onclick="resolveDecision('shoot')" class="flex min-w-40 items-center justify-center gap-3 rounded-xl border border-emerald-500/50 bg-slate-900 px-5 py-4 text-left text-sm font-bold text-white transition hover:bg-slate-800">
+                        <i class="fa-solid fa-arrow-up text-xl text-emerald-300" aria-hidden="true"></i> Shoot
+                    </button>
+                `;
+            }
+        }
+
+        function updateLivePlayerRating() {
+            if (isMatchdayVisible()) {
+                document.getElementById('live-rating').innerText = matchEngine.playerStats.rating.toFixed(1);
+            }
+        }
+
+        function formatPlayerRatingChange(previousRating) {
+            const ratingChange = Math.round((matchEngine.playerStats.rating - previousRating) * 10) / 10;
+            const changeText = ratingChange > 0 ? `+${ratingChange.toFixed(1)}` : ratingChange < 0 ? ratingChange.toFixed(1) : 'no change';
+            return `Player Rating: ${matchEngine.playerStats.rating.toFixed(1)} (${changeText})`;
+        }
+
+        function showMatchGoalPopup(commentary, ratingText) {
+            matchEngine.paused = true;
+            const userScore = matchEngine.isHome ? matchEngine.homeScore : matchEngine.awayScore;
+            const opponentScore = matchEngine.isHome ? matchEngine.awayScore : matchEngine.homeScore;
+            document.getElementById('goal-popup-commentary').innerText = commentary;
+            document.getElementById('goal-popup-score').innerText = `${gameState.player.club} ${userScore} - ${opponentScore} ${matchEngine.opponent}`;
+            document.getElementById('goal-popup-rating').innerText = ratingText;
+            document.getElementById('modal-goal').classList.remove('hidden');
+            document.getElementById('modal-goal').classList.add('flex');
+        }
+
+        window.continueAfterGoal = function() {
+            document.getElementById('modal-goal').classList.add('hidden');
+            document.getElementById('modal-goal').classList.remove('flex');
+            matchEngine.paused = false;
+            if (matchEngine.active) runMatchLoop();
+        };
+
+        function showMinigameResult(resultText, feedbackText = '', keepShotGrid = false) {
+            clearMinigameTimers();
+            activeMinigameStage = { type: 'result' };
+            document.getElementById('decision-timer').classList.add('hidden');
+            document.getElementById('decision-sequence').innerHTML = '';
+            setMinigameScreen('Chance Result', resultText);
+
+            const feedback = document.getElementById('decision-feedback');
+            feedback.innerText = feedbackText;
+            feedback.classList.toggle('hidden', !feedbackText);
+
+            const options = document.getElementById('decision-options');
+            if (!keepShotGrid) {
+                options.className = 'flex flex-wrap justify-center gap-3 pt-2';
+                options.innerHTML = '';
+            }
+            options.insertAdjacentHTML('beforeend', `
+                <button onclick="resumeAfterMinigame()" class="${keepShotGrid ? 'col-span-3' : ''} rounded-xl bg-emerald-500 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-400">
+                    Continue Match
+                </button>
+            `);
+        }
+
+        function failMinigameSequence(stage) {
+            if (!activeMinigameStage || activeMinigameStage.type !== 'sequence') return;
+            clearMinigameTimers();
+
+            let failureText;
+            let ratingChange;
+            if (stage === 1) {
+                failureText = 'Horrible first touch as the ball hits your knee and goes out of play.';
+                ratingChange = -0.5;
+            } else if (stage === 2 && Math.random() < 0.5) {
+                failureText = 'You tripped over your own feet and fall down, giving the ball away.';
+                ratingChange = -0.7;
+            } else if (stage === 2) {
+                const move = minigameDribbleMoves[randomInteger(0, minigameDribbleMoves.length - 1)];
+                failureText = `You try a ${move} and get your ankles shattered by an aggressive slide tackle.`;
+                ratingChange = -0.4;
+            } else if (Math.random() < 0.5) {
+                failureText = "You overhit the pass into the opposing keeper's hands.";
+                ratingChange = -0.5;
+            } else {
+                failureText = 'You underhit the pass and it is intercepted by the defender.';
+                ratingChange = -0.5;
             }
 
+            matchEngine.playerStats.rating = Math.max(0, Math.round((matchEngine.playerStats.rating + ratingChange) * 10) / 10);
+            activeMinigameStage = { type: 'failure' };
+            document.getElementById('decision-timer').classList.add('hidden');
+            document.getElementById('decision-sequence').innerHTML = '';
+            document.getElementById('decision-options').innerHTML = '';
+            setMinigameScreen('Chance Lost', failureText);
+            const feedback = document.getElementById('decision-feedback');
+            feedback.innerText = `Player Rating: ${matchEngine.playerStats.rating.toFixed(1)} (${ratingChange.toFixed(1)})`;
+            feedback.classList.remove('hidden');
+
+            const log = document.getElementById('commentary-log');
+            if (isMatchdayVisible() && log) {
+                log.innerHTML += `<div class="text-rose-300 font-bold">${matchEngine.minute}' ${failureText} (${ratingChange.toFixed(1)} rating)</div>`;
+                log.scrollTop = log.scrollHeight;
+            }
+            updateLivePlayerRating();
+            showMinigameResult(failureText, `Player Rating: ${matchEngine.playerStats.rating.toFixed(1)} (${ratingChange.toFixed(1)})`);
+        }
+
+        window.resumeAfterMinigame = function() {
+            clearMinigameTimers();
+            document.getElementById('modal-decision').classList.add('hidden');
+            document.getElementById('modal-decision').classList.remove('flex');
+            activeMinigameStage = null;
+            matchEngine.pendingChance = null;
             matchEngine.paused = false;
             runMatchLoop();
+        }
+
+        function finishMinigameChance(isGoal, decisionType, keepShotGrid = false) {
+            const chanceEvent = matchEngine.pendingChance;
+            if (!chanceEvent) return;
+            clearMinigameTimers();
+            const previousRating = matchEngine.playerStats.rating;
+            if (isGoal) {
+                document.getElementById('modal-decision').classList.add('hidden');
+                document.getElementById('modal-decision').classList.remove('flex');
+            }
+            matchEngine.pendingChance = null;
+            const log = document.getElementById('commentary-log');
+            const previousLogCount = log ? log.children.length : 0;
+            processMatchChance({ ...chanceEvent, isGoal }, decisionType);
+            if (isGoal && isMatchdayVisible() && !matchEngine.quickSim) return;
+            const outcomeLine = log && log.children.length > previousLogCount
+                ? log.lastElementChild.innerText.replace(/^\d+'\s*/, '')
+                : 'Chance complete.';
+            showMinigameResult(outcomeLine, formatPlayerRatingChange(previousRating), keepShotGrid);
+        }
+
+        function startMinigameShotGrid() {
+            clearMinigameTimers();
+            const goalCells = new Set();
+            while (goalCells.size < 3) goalCells.add(randomInteger(0, 8));
+            activeMinigameStage = { type: 'shot', goalCells };
+
+            setMinigameScreen('Pick Your Spot', 'Choose one of the nine sections of the goal.');
+            document.getElementById('decision-sequence').innerHTML = '';
+            document.getElementById('decision-timer').classList.add('hidden');
+            document.getElementById('decision-feedback').classList.add('hidden');
+
+            const options = document.getElementById('decision-options');
+            options.className = 'mx-auto grid w-full max-w-xs grid-cols-3 gap-1 rounded-lg border-2 border-slate-400 bg-slate-900 p-2';
+            options.innerHTML = Array.from({ length: 9 }, (_, index) => `
+                <button data-goal-section="${index}" onclick="chooseMinigameGoalSection(${index})" aria-label="Choose goal section ${index + 1}" class="aspect-square border border-slate-500 bg-slate-800/80 text-slate-300 transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                    ${index + 1}
+                </button>
+            `).join('');
+        }
+
+        window.chooseMinigameGoalSection = function(index) {
+            if (!activeMinigameStage || activeMinigameStage.type !== 'shot') return;
+            const isGoal = activeMinigameStage.goalCells.has(index);
+            document.querySelectorAll('[data-goal-section]').forEach(button => { button.disabled = true; });
+            const selectedCell = document.querySelector(`[data-goal-section="${index}"]`);
+            selectedCell.className = isGoal
+                ? 'aspect-square border border-emerald-200 bg-emerald-400 text-slate-950 shadow-[0_0_24px_rgba(16,185,129,0.9)]'
+                : 'aspect-square border border-rose-200 bg-rose-500 text-white shadow-[0_0_24px_rgba(244,63,94,0.9)]';
+
+            document.getElementById('decision-title').innerText = isGoal ? 'GOAL!' : 'SAVED!';
+            document.getElementById('decision-desc').innerText = isGoal
+                ? `What a GOAL by ${gameState.player.name}. Absolute Genius!`
+                : `BRILLIANT EFFORT BY ${gameState.player.name.toUpperCase()} DENIED BY THE KEEPER!`;
+            minigameTransitionId = setTimeout(() => finishMinigameChance(isGoal, isGoal ? 'shoot-goal' : 'shoot-miss', true), 550);
         };
+
+        window.resolveDecision = function(type) {
+            if (!activeMinigameStage || activeMinigameStage.type !== 'choice') return;
+            if (type === 'pass') {
+                const chance = matchEngine.pendingChance;
+                finishMinigameChance(chance && chance.isGoal, chance && chance.isGoal ? 'pass-goal' : 'pass-miss');
+            } else if (type === 'shoot') {
+                startMinigameShotGrid();
+            }
+        };
+
+        document.addEventListener('keydown', event => {
+            if (!activeMinigameStage) return;
+
+            if (activeMinigameStage.type === 'intro') {
+                if (minigameArrows.some(arrow => arrow.key === event.key)) event.preventDefault();
+                return;
+            }
+
+            if (activeMinigameStage.type === 'sequence') {
+                if (!minigameArrows.some(arrow => arrow.key === event.key)) return;
+                event.preventDefault();
+                const expectedKey = activeMinigameStage.sequence[activeMinigameStage.inputIndex];
+                if (event.key !== expectedKey) {
+                    failMinigameSequence(activeMinigameStage.stage);
+                    return;
+                }
+
+                const completedIndex = activeMinigameStage.inputIndex++;
+                const sequenceStep = document.querySelector(`[data-sequence-index="${completedIndex}"]`);
+                if (sequenceStep) sequenceStep.classList.add('border-emerald-400', 'bg-emerald-500/30', 'text-emerald-200');
+                if (activeMinigameStage.inputIndex >= activeMinigameStage.sequence.length) {
+                    advanceMinigameAfterSequence(activeMinigameStage.stage);
+                }
+                return;
+            }
+
+            if (activeMinigameStage.type === 'choice') {
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    resolveDecision('pass');
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    resolveDecision('shoot');
+                }
+                return;
+            }
+
+            if (activeMinigameStage.type === 'shot' && /^[1-9]$/.test(event.key)) {
+                event.preventDefault();
+                chooseMinigameGoalSection(Number(event.key) - 1);
+            }
+        });
 
         function finishMatch() {
             matchEngine.active = false;
@@ -2317,13 +2817,17 @@
 
             let tableHTML = `
                 <div class="min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-800 bg-slate-950/50">
-                    <table class="w-full min-w-[380px] text-[10px] text-left">
+                    <table class="w-full min-w-[520px] text-[10px] text-left">
                         <thead class="sticky top-0 bg-slate-900 text-slate-400 uppercase">
                             <tr>
                                 <th class="p-2">#</th>
                                 <th class="p-2">Club</th>
+                                <th class="p-2 text-center">OVR</th>
+                                <th class="p-2 text-center">W</th>
+                                <th class="p-2 text-center">D</th>
+                                <th class="p-2 text-center">L</th>
                                 <th class="p-2 text-center">GD</th>
-                                <th class="p-2 text-right">Pts</th>
+                                <th class="p-2 text-right">PTS</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-800">
@@ -2335,6 +2839,10 @@
                     <tr class="${isUser ? 'text-emerald-400 font-bold' : 'text-slate-300'}">
                         <td class="p-2">${idx + 1}</td>
                         <td class="p-2">${team.name}</td>
+                        <td class="p-2 text-center">${team.ovr}</td>
+                        <td class="p-2 text-center">${team.wins}</td>
+                        <td class="p-2 text-center">${team.draws}</td>
+                        <td class="p-2 text-center">${team.losses}</td>
                         <td class="p-2 text-center">${team.gf - team.ga}</td>
                         <td class="p-2 text-right font-bold">${team.pts}</td>
                     </tr>
@@ -2408,7 +2916,21 @@
 
             gameState.career.season++;
             gameState.career.week = 1;
+            gameState.player.age++;
             gameState.career.pressAnswered = false;
+
+            gameState.career.seasonHistory = gameState.career.seasonHistory || [];
+            const completedSeason = gameState.career.seasonTotals;
+            const completedStandings = [...gameState.league].sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
+            const completedPosition = completedStandings.findIndex(team => team.name === gameState.player.club) + 1;
+            const completedTeam = completedStandings[completedPosition - 1];
+            gameState.career.seasonHistory.push({
+                season: gameState.career.season - 1,
+                team: gameState.player.club,
+                position: completedPosition,
+                ovr: completedTeam ? completedTeam.ovr : getTeamOvr(gameState.player.club),
+                ...completedSeason
+            });
 
             // Reset Season Stats
             gameState.career.seasonTotals = { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 };
@@ -2509,6 +3031,9 @@
                     if (!gameState.career.seasonTotals) {
                         gameState.career.seasonTotals = { apps: 0, goals: 0, assists: 0, ratingSum: 0, motm: 0 };
                     }
+                    if (!Array.isArray(gameState.career.seasonHistory)) {
+                        gameState.career.seasonHistory = [];
+                    }
                     // Add ratings to older saves and keep team overall equal to their average.
                     if (gameState.league) {
                         gameState.league.forEach(t => {
@@ -2517,8 +3042,8 @@
                                 t.name = t.name.name;
                             }
                             const teamRatings = [t.offense, t.midfield, t.defense];
-                            const ratingsAreValid = teamRatings.every(rating => Number.isInteger(rating) && rating >= 70 && rating <= 100) &&
-                                Math.max(...teamRatings) - Math.min(...teamRatings) <= 15;
+                            const ratingsAreValid = teamRatings.every(rating => Number.isInteger(rating) && rating >= 60 && rating <= 100) &&
+                                Math.max(...teamRatings) - Math.min(...teamRatings) <= 20;
                             if (!ratingsAreValid) {
                                 Object.assign(t, createTeamRatings());
                                 teamRatingsNeedSave = true;
